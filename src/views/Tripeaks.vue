@@ -8,9 +8,9 @@
 				:params="cardProps('table', card)"
 				@click="cardClickHandler('table', card, $event)"/>
 			</div>
-			<div class="card tower-cleared" v-if="!cardsOnTable[0].visible" style="grid-area: 1 / 4"></div>
-			<div class="card tower-cleared" v-if="!cardsOnTable[1].visible" style="grid-area: 1 / 10"></div>
-			<div class="card tower-cleared" v-if="!cardsOnTable[2].visible" style="grid-area: 1 / 16"></div>
+			<div class="card tower-cleared" v-if="!cardsOnTable[0].visible" style="grid-area: 1 / 4">500</div>
+			<div class="card tower-cleared" v-if="!cardsOnTable[1].visible" style="grid-area: 1 / 10">500</div>
+			<div class="card tower-cleared" v-if="!cardsOnTable[2].visible" style="grid-area: 1 / 16">500</div>
 		</div>
 
 		<div class="game-over-text" :class="{ 'hideContent' : !gameOver }">
@@ -107,7 +107,7 @@ const startGame = () => {
 }
 
 const checkPlay = (cardPosition) => {
-	/* Strips the card to a value between 1 and 13 */
+	/* Strips the card to a value between 1 (A) and 13 (K) */
 	const waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
 	const table = parseInt(cardsOnTable.value[cardPosition].id.slice(1, 3))
 
@@ -115,11 +115,11 @@ const checkPlay = (cardPosition) => {
 		waste === 1 && table === 13 ||
 		waste === table + 1 ||
 		waste === table - 1) {
-			console.log(cardPosition)
+			if (cardPosition <= 2) score.value += 500
 			cardsOnTable.value[cardPosition].visible = false
 			cardsOnWaste.value.push(cardsOnTable.value[cardPosition])
 			cardsLeft.value--
-			score.value =  score.value + 100 * streak.value
+			score.value = score.value + 100 * streak.value
 			streak.value++
 			checkVisibility()
 			checkWin()
@@ -226,20 +226,28 @@ function cardToText (card) {
 	return cardValue + cardSuit
 }
 
-/*************************************************
-*                WORK IN PROGRESS                *
-*************************************************/
-/** implementar pontos:
-@score = 0
-@streak = 1
-carta clicada com sucesso -> score =  score + 100 * streak
-carta clicada sem carregar no stock -> streak + 1
-stock clicado -> streak = 1
-torre limpa -> score += 1000
-*/
 const checkWin = () => {
-	// temp verification only if there are no more cards on table
-	// missing possible plays verification
+	/* Strips the card to a value between 1 (A) and 13 (K) */
+	const waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
+
+	let playableCards = cardsOnTable.value.filter(card => (card.visible === true && card.cover === false))
+	let validPlay = false
+	let howManyValidPlays = 0
+
+	if (playableCards.length) {
+		let tempCard = 0
+		for (let i = 0 ; i < playableCards.length ; i++) {
+			tempCard = parseInt(playableCards[i].id.slice(1, 3))
+			if (waste === 13 && tempCard === 1 ||
+				waste === 1 && tempCard === 13 ||
+				waste === tempCard + 1 ||
+				waste === tempCard - 1) {
+					howManyValidPlays++
+					validPlay = true
+					if (validPlay) return
+				}
+		}
+	}
 
 	/* If stock isn't over but there are no cards left on table = win*/
 	if (cardsLeft.value === 0 && cardsOnStock.value.length) {
@@ -247,36 +255,7 @@ const checkWin = () => {
 		gameStatus.value = 'Win!'
 		return
 	}
-	else checkLoss()
-}
-
-const checkLoss = () => {
-	// Check for possible moves
-	// let possiblePlays = 0
-
-	// if (!cardsOnStock.value.length) {
-	// 	const arrLen = cardsOnTable.value.length
-		
-	// 	for (let i = 0; i < arrLen; i++) {
-	// 		// perceber o que fazem estas vars
-	// 		let waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
-	// 		let table = parseInt(cardsOnTable.value[i].id.slice(1, 3))
-
-	// 		// nao faço ideia que verificacoes sao estas
-	// 		if ((waste === 13 && table === 1 || waste === 1 && table === 13 ||
-	// 			waste === table + 1 || waste === table - 1) &&
-	// 			!cardsOnTable.value[i].cover && cardsOnTable.value[i].visible) {
-	// 				possiblePlays++
-	// 		}
-	// 	}
-		// if (possiblePlays === 0 && cardsLeft.value > 0) { gameOver.value = true }
-		// if (possiblePlays === 0 && cardsLeft.value === 0) { gameStatus.value = 'Winner!' }
-	// }
-
-	// temp verification
-	/* If there are still cards on the table (cardsLeft) and stock is over = gameOver */
-	// missing verification for possible play before gameOver.value = true
-	if (cardsLeft.value > 0 && !cardsOnStock.value.length) {
+	else if (cardsLeft.value > 0 && !cardsOnStock.value.length) {
 		gameOver.value = true
 		gameStatus.value = 'Game Over!'
 	}
@@ -293,13 +272,12 @@ const cardClickHandler = (where, cardPosition, event) => {
 		gameStatus.value = cardToText(cardsOnTable.value[cardPosition].id) + ' played.'
 		checkPlay(cardPosition)
 		event.stopPropagation()
-		checkWin()
 	}
 	if (where === 'stock') {
 		/* Reset Streak */
 		streak.value = 1
 		cardsOnWaste.value.push(cardsOnStock.value.pop())
-		checkLoss()
+		checkWin()
 	}
 }
 
@@ -367,6 +345,10 @@ a, a:hover {
 	width: calc(var(--card-width)*0.55);
 	height: calc(var(--card-width)*0.55);
 	transform: translateY(100%) translateX(42%);
+	color: #00ff00;
+	text-align: center;
+	vertical-align: middle;
+	line-height: calc(var(--card-width)*0.55);
 	z-index: -1;
 }
 .stock-waste {
