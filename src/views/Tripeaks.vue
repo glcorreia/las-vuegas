@@ -73,28 +73,32 @@ const win = ref(false)
 *************************************************/
 const startGame = () => {
 	const remainingCards = []
-	let arrLen
-	
-	gameStatus.value = ''
-	cardsOnStock.value = [] // Reset decks
-	cardsOnWaste.value = [] // Reset decks
-	cardsOnTable.value = [] // Reset decks
-	gameOver.value = false
-	win.value = false
+
+	/* Reset deck */
+	cardsOnStock.value = []
+	cardsOnWaste.value = []
+	cardsOnTable.value = []
+	/* Reset score */
 	score.value = 0
 	streak.value = 1
+	/* Reset info */
+	gameStatus.value = ''
+	gameOver.value = false
+	win.value = false
 	
-	cardsOnStock.value = fy_shuffle(cardData) // Shuffle deck
-	arrLen = cardsOnStock.value.length
+	/* Shuffle deck */
+	cardsOnStock.value = fy_shuffle(cardData)
 
-	for (let i = 0; i < arrLen; i++) {
-		cardsOnStock.value[i].cover = false // Reset flipped cards
-		cardsOnStock.value[i].visible = true // Reset flipped cards
+	for (let i = 0; i < cardsOnStock.value.length; i++) {
+		/* Resets deck visibility */
+		cardsOnStock.value[i].cover = false
+		cardsOnStock.value[i].visible = true
 
 		if (i < 28) {
 			cardsOnTable.value.push(cardsOnStock.value[i])
+			/* Flips the 3 back rows */
 			if (i < 18) {
-				cardsOnTable.value[i].cover = true // Hide first 3 rows of cards
+				cardsOnTable.value[i].cover = true
 			}
 		}
 		else if (i === 28) {
@@ -118,7 +122,9 @@ const checkPlay = (cardPosition) => {
 		waste === 1 && table === 13 ||
 		waste === table + 1 ||
 		waste === table - 1) {
+			/* If last card from tower is played, adds 500pts to score */
 			if (cardPosition <= 2) score.value += 500
+
 			cardsOnTable.value[cardPosition].visible = false
 			cardsOnWaste.value.push(cardsOnTable.value[cardPosition])
 			cardsLeft.value--
@@ -129,25 +135,55 @@ const checkPlay = (cardPosition) => {
 		}
 }
 
-function cardVisible(card) {
-	return cardsOnTable.value[card].visible
-}
-
 const checkVisibility = () => {
-	/* Check 1st row visibility */
+	/* Check if 2nd row is covering 1st row */
 	for (let i = 0; i <= 2; i++) {
 		if (!cardVisible(i * 2 + 3) && !cardVisible(i * 2 + 4)) { cardsOnTable.value[i].cover = false }
 	}
-	/* Check 2nd row visibility */
+	/* Check if 3rd row is covering 2nd row */
 	let temp = 3
 	for (let i = 3; i < 8; i = i+2) {
 		if (!cardVisible(temp + 6) && !cardVisible(temp + 7)) { cardsOnTable.value[i].cover = false }
 		if (!cardVisible(temp + 7) && !cardVisible(temp + 8)) { cardsOnTable.value[i + 1].cover = false }
 		temp = temp + 3
 	}
-	/* Check 3rd row visibility */
+	/* Check if 4th row is covering 3rd row */
 	for (let i = 9; i <= 17; i++) {
 		if (!cardVisible(i + 9) && !cardVisible(i + 10)) { cardsOnTable.value[i].cover = false }
+	}
+}
+
+const checkWin = () => {
+	/* Strips the card to a value between 1 (A) and 13 (K) */
+	const waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
+
+	/* Get all cards on table that are clickable */
+	let playableCards = cardsOnTable.value.filter(card => (card.visible === true && card.cover === false))
+	let validPlay = false
+
+	/* If there are available cards to click, check if there are possible plays */
+	if (playableCards.length) {
+		let tempCard = 0
+		for (let i = 0 ; i < playableCards.length ; i++) {
+			tempCard = parseInt(playableCards[i].id.slice(1, 3))
+			if (waste === 13 && tempCard === 1 || waste === 1 && tempCard === 13 || waste === tempCard + 1 || waste === tempCard - 1) {
+				validPlay = true
+				if (validPlay) return
+			}
+		}
+	}
+
+	/* If stock isn't over but there are no cards left on table = win */
+	if (cardsLeft.value === 0 && cardsOnStock.value.length) {
+		gameOver.value = true
+		win.value = true
+		gameStatus.value = ''
+		return
+	}
+	/* If stock is over but there are still cards on the table = game over */
+	else if (cardsLeft.value > 0 && !cardsOnStock.value.length) {
+		gameOver.value = true
+		gameStatus.value = 'Game Over!'
 	}
 }
 
@@ -158,7 +194,7 @@ const range = (start, end) => {
 	return Array(end - start + 1).fill().map((_, idx) => start + idx)
 }
 
-// Fisher-Yates shuffle
+/* Fisher-Yates shuffle */
 const fy_shuffle = (array) => {
 	let cardsLeft = array.length, temp, nextCard
 
@@ -172,6 +208,12 @@ const fy_shuffle = (array) => {
 	return array
 }
 
+/* Makes card visible */
+function cardVisible(card) {
+	return cardsOnTable.value[card].visible
+}
+
+/* Returns card properties based on where they are */
 function cardProps(whereIsCard, singleCardId) {
 	if (whereIsCard === 'table') {
 		return {
@@ -188,6 +230,7 @@ function cardProps(whereIsCard, singleCardId) {
 	
 }
 
+/* Transforms card value from json file to a readable format */
 function cardToText (card) {
 	let cardSuit, cardValue
 
@@ -228,39 +271,6 @@ function cardToText (card) {
 	}
 	return cardValue + cardSuit
 }
-
-const checkWin = () => {
-	/* Strips the card to a value between 1 (A) and 13 (K) */
-	const waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
-
-	/* Get all cards on table that are clickable */
-	let playableCards = cardsOnTable.value.filter(card => (card.visible === true && card.cover === false))
-	let validPlay = false
-
-	if (playableCards.length) {
-		let tempCard = 0
-		for (let i = 0 ; i < playableCards.length ; i++) {
-			tempCard = parseInt(playableCards[i].id.slice(1, 3))
-			if (waste === 13 && tempCard === 1 || waste === 1 && tempCard === 13 || waste === tempCard + 1 || waste === tempCard - 1) {
-				validPlay = true
-				if (validPlay) return
-			}
-		}
-	}
-
-	/* If stock isn't over but there are no cards left on table = win*/
-	if (cardsLeft.value === 0 && cardsOnStock.value.length) {
-		gameOver.value = true
-		win.value = true
-		gameStatus.value = ''
-		return
-	}
-	else if (cardsLeft.value > 0 && !cardsOnStock.value.length) {
-		gameOver.value = true
-		gameStatus.value = 'Game Over!'
-	}
-}
-
 /*************************************************
 *                 Click Handlers                 *
 *************************************************/
@@ -309,10 +319,10 @@ a, a:hover {
 .board {
 	margin: 0 auto 100px;
 	
+	/* Grid settings */
 	display: grid;
 	grid-template-rows: repeat(4, calc(var(--card-height)/2));
 	grid-template-columns: repeat(20, calc(var(--card-width)/2)) ;
-	
 	grid-column-gap: 2px;
 }
 :deep().card img {
@@ -323,7 +333,6 @@ a, a:hover {
 	border-radius: 6px;
 
 	cursor: pointer;
-	/* opacity: 0.7; */
 }
 .hideContent {
 	opacity: 0;
@@ -338,86 +347,91 @@ a, a:hover {
 	height: 30px;
 }
 .tower-cleared {
-	-webkit-box-shadow:inset 0px 0px 0px 4px #00ff00;
-	-moz-box-shadow:inset 0px 0px 0px 4px #00ff00;
-	box-shadow:inset 0px 0px 0px 4px #00ff00;
-	border-radius: 50%;
 	width: calc(var(--card-width)*0.55);
 	height: calc(var(--card-width)*0.55);
 	transform: translateY(100%) translateX(42%);
+	border-radius: 50%;
+	z-index: -1;
+	
+	-webkit-box-shadow:inset 0px 0px 0px 4px #00ff00;
+	-moz-box-shadow:inset 0px 0px 0px 4px #00ff00;
+	box-shadow:inset 0px 0px 0px 4px #00ff00;
+
 	color: #00ff00;
 	text-align: center;
 	vertical-align: middle;
 	line-height: calc(var(--card-width)*0.55);
-	z-index: -1;
 }
 .stock-waste {
-	padding-top: 40px;
-	position: relative;
 	width: 700px;
 	height: 110px;
+	position: relative;
+
+	padding-top: 40px;
 	margin: auto;
 }
 .waste {
-	position: absolute;
 	width: 50%;
+	position: absolute;
+
 	float: left;
 }
 .stock {
-	position: absolute;
-	float: right;
 	width: 50%;
+	position: absolute;
+
+	float: right;
 	display: inline;
 }
 .waste-cards {
-	position: absolute;
 	right: 5px;
+	position: absolute;
 }
 .stock-cards {
-	position: absolute;
 	left: 5px;
+	position: absolute;
 }
 .stock-lose {
-	margin: 0 auto 70px;
-	position: relative;
 	width: calc(var(--card-width)*0.55);
 	height: calc(var(--card-width)*0.55);
 	transform: translateY(10%) translateX(-20%);
+	position: relative;
+	z-index: -1;
+
+	margin: 0 auto 70px;
+
 	&:after {
-		position: absolute;
-		top: 0;
-		bottom: 0;
 		left: 0;
 		right: 0;
+		top: 0;
+		bottom: 0;
+		position: absolute;
+		
 		content: "\274c";
 		font-size: 50px;
 		color: #fff;
 		line-height: 100px;
 		text-align: center;
 	}
-	z-index: -1;
 }
 .stock-win {
-	margin: 0 auto 70px;
-	position: relative;
 	width: calc(var(--card-width)*0.55);
 	height: calc(var(--card-width)*0.55);
-	/* transform: translateY(10%) translateX(-20%); */
+	transform: translateY(100%);
+	position: relative;
+	z-index: -1;
+	
+	margin: 0 auto 70px;
 
 	-webkit-box-shadow:inset 0px 0px 0px 4px #00ff00;
 	-moz-box-shadow:inset 0px 0px 0px 4px #00ff00;
 	box-shadow:inset 0px 0px 0px 4px #00ff00;
 	border-radius: 50%;
-
-	width: calc(var(--card-width)*0.55);
-	height: calc(var(--card-width)*0.55);
-	transform: translateY(100%);
 	
 	color: #00ff00;
 	text-align: center;
 	vertical-align: middle;
 	line-height: calc(var(--card-width)*0.55);
-	z-index: -1;
 }
 
 .msg-log {

@@ -3,10 +3,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
 import cardData from '../assets/cards/cards.json'
 import cardExtras from '../assets/cards/cardsExtras.json'
+
+/* Vue */
+import { ref } from 'vue'
 
 /* Data */
 const emptyCard = ref(false)
@@ -23,13 +24,17 @@ const props = defineProps({
 
 const getCardPath = () => {
 	if (props.params) {
-		if (props.params.cover) return ('../src/assets/cards/' + cardExtras[1].filename).toString() // Deck cover 1
-		if (props.params.cardId) return ('../src/assets/cards/' + cardData[cardData.findIndex(card => card.id === props.params.cardId)].filename).toString() // Find index where id = prop and returns it's filename
+		/* Deck cover */
+		if (props.params.cover) return ('../src/assets/cards/' + cardExtras[1].filename).toString()
+		/* Find index where card.id = prop.cardId and returns it's filename */
+		if (props.params.cardId) return ('../src/assets/cards/' + cardData[cardData.findIndex(card => card.id === props.params.cardId)].filename).toString()
 	}
+	/* Returns a random card */
 	if (props.randomCard) return ('../src/assets/cards/' + cardData[randomCardPicker(0, 51)].filename).toString()
+	/* Returns an empty card */
 	else {
 		emptyCard.value = true
-		return // Return empty card
+		return
 	}
 }
 
@@ -38,6 +43,3 @@ const randomCardPicker = (min, max) => {
 }
 
 </script>
-
-<style scoped>
-</style>
