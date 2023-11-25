@@ -30,7 +30,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="card stock-over" v-else></div>
+		<div class="card stock-lose" v-if="gameOver && !win"></div>
+		<div class="card stock-win" v-if="gameOver && win">Win</div>
 		<div class="msg-log">
 			<h4>Score: {{ score }} pts.</h4>
 		</div>
@@ -65,6 +66,7 @@ const streak = ref(1)
 const gameStatus = ref('')
 const cardsLeft = ref(0)
 const gameOver = ref(false)
+const win = ref(false)
 
 /*************************************************
 *                    Functions                   *
@@ -78,6 +80,7 @@ const startGame = () => {
 	cardsOnWaste.value = [] // Reset decks
 	cardsOnTable.value = [] // Reset decks
 	gameOver.value = false
+	win.value = false
 	score.value = 0
 	streak.value = 1
 	
@@ -230,29 +233,26 @@ const checkWin = () => {
 	/* Strips the card to a value between 1 (A) and 13 (K) */
 	const waste = parseInt(cardsOnWaste.value.slice(-1)[0].id.slice(1, 3))
 
+	/* Get all cards on table that are clickable */
 	let playableCards = cardsOnTable.value.filter(card => (card.visible === true && card.cover === false))
 	let validPlay = false
-	let howManyValidPlays = 0
 
 	if (playableCards.length) {
 		let tempCard = 0
 		for (let i = 0 ; i < playableCards.length ; i++) {
 			tempCard = parseInt(playableCards[i].id.slice(1, 3))
-			if (waste === 13 && tempCard === 1 ||
-				waste === 1 && tempCard === 13 ||
-				waste === tempCard + 1 ||
-				waste === tempCard - 1) {
-					howManyValidPlays++
-					validPlay = true
-					if (validPlay) return
-				}
+			if (waste === 13 && tempCard === 1 || waste === 1 && tempCard === 13 || waste === tempCard + 1 || waste === tempCard - 1) {
+				validPlay = true
+				if (validPlay) return
+			}
 		}
 	}
 
 	/* If stock isn't over but there are no cards left on table = win*/
 	if (cardsLeft.value === 0 && cardsOnStock.value.length) {
 		gameOver.value = true
-		gameStatus.value = 'Win!'
+		win.value = true
+		gameStatus.value = ''
 		return
 	}
 	else if (cardsLeft.value > 0 && !cardsOnStock.value.length) {
@@ -377,7 +377,7 @@ a, a:hover {
 	position: absolute;
 	left: 5px;
 }
-.stock-over {
+.stock-lose {
 	margin: 0 auto 70px;
 	position: relative;
 	width: calc(var(--card-width)*0.55);
@@ -395,6 +395,28 @@ a, a:hover {
 		line-height: 100px;
 		text-align: center;
 	}
+	z-index: -1;
+}
+.stock-win {
+	margin: 0 auto 70px;
+	position: relative;
+	width: calc(var(--card-width)*0.55);
+	height: calc(var(--card-width)*0.55);
+	/* transform: translateY(10%) translateX(-20%); */
+
+	-webkit-box-shadow:inset 0px 0px 0px 4px #00ff00;
+	-moz-box-shadow:inset 0px 0px 0px 4px #00ff00;
+	box-shadow:inset 0px 0px 0px 4px #00ff00;
+	border-radius: 50%;
+
+	width: calc(var(--card-width)*0.55);
+	height: calc(var(--card-width)*0.55);
+	transform: translateY(100%);
+	
+	color: #00ff00;
+	text-align: center;
+	vertical-align: middle;
+	line-height: calc(var(--card-width)*0.55);
 	z-index: -1;
 }
 
