@@ -5,20 +5,18 @@
 			<RouterLink to="/tripeaks">
 				<div class="item available">Tri-Peaks</div>
 			</RouterLink>
-			<div class="item">Solitaire</div>
-			<div class="item">Yahtzee</div>
-			<div class="item">Sudoku</div>
-			<div class="item">TicTacToe</div>
-			<div class="item">Slot</div>
-			<div class="item">Mahjong</div>
-			<div class="item">Memory</div>
-			<div class="item"></div>
+			<RouterLink to="/mahjong">
+				<div class="item available">Mahjong</div>
+			</RouterLink>
+			<RouterLink to="/sudoku">
+				<div class="item available">Sudoku</div>
+			</RouterLink>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
@@ -51,13 +49,13 @@ a, a:hover {
 .item {
 	width: 100px;
 	height: 100px;
-	background-color: #8CD867;
+	background-color: #ED7D3A;
 	border: 2px solid white;
 	/* Trick to align vertically */
 	line-height: 100px;
 }
 .available {
-	background-color: #ED7D3A;
+	background-color: #8CD867;
 }
 .available:hover{
 	background-color:#46B1C9;
