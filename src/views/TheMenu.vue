@@ -5,12 +5,12 @@
 			<RouterLink to="/tripeaks">
 				<div class="item available">Tri-Peaks</div>
 			</RouterLink>
-			<RouterLink to="/mahjong">
-				<div class="item available">Mahjong</div>
-			</RouterLink>
 			<RouterLink to="/sudoku">
 				<div class="item available">Sudoku</div>
 			</RouterLink>
+			<!-- <RouterLink to="/mahjong"> -->
+				<div class="item">???</div>
+			<!-- </RouterLink> -->
 		</div>
 	</div>
 </template>
