@@ -38,16 +38,14 @@ const initializeGame = () => {
 
 const generateRegion1 = () => {
 	/* Get randomized numbers */
-	let tempArr = generateNumbers()
+	let randomNumbers = generateNumbers()
 
 	for (let column = 0; column <= 2; column++) {
-		/* .slice(-1) gets the last item from an array .pop() removes it */
-		board_region_1.value[1 + 9 * column] = tempArr.slice(-1)
-		tempArr.pop()
-		board_region_1.value[2 + 9 * column] = tempArr.slice(-1)
-		tempArr.pop()
-		board_region_1.value[3 + 9 * column] = tempArr.slice(-1)
-		tempArr.pop()
+		for (let row = 1; row <= 3; row++) {
+			/* .slice(-1) gets the last item from an array .pop() removes it */
+			board_region_1.value[row + 9 * column] = randomNumbers.slice(-1)
+			randomNumbers.pop()
+		}
 	}
 
 	gameBoard.value.push(...board_region_1.value)
@@ -56,8 +54,8 @@ const generateRegion1 = () => {
 *                     Helpers                    *
 *************************************************/
 const generateNumbers = () => {
-	let tempArr = [1,2,3,4,5,6,7,8,9]
-	return tempArr.sort(() => Math.random() - 0.5)
+	let randomNumbers = [1,2,3,4,5,6,7,8,9]
+	return randomNumbers.sort(() => Math.random() - 0.5)
 }
 
 initializeGame()
