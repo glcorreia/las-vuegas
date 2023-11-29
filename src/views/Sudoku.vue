@@ -3,7 +3,7 @@
 		<h1>Sudoku</h1>
 		
 		<div class="grid-container">
-			<div v-for="square in 81" :key="square" class="grid-item" :id="square">{{ parseInt(gameBoard[square + 1]) }}</div>
+			<div v-for="square in 81" :key="square" class="grid-item" :id="square">{{ parseInt(gameBoard[square]) }}</div>
 		</div>
 
 		<div class="go-back"><RouterLink to="/">« Go Back</RouterLink></div>
@@ -18,7 +18,7 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 /* Data */
-const gameBoard = ref([0])
+const gameBoard = ref(Array(100).fill(0))
 const board_region_1 = ref([])
 const board_region_2 = ref([])
 const board_region_3 = ref([])
@@ -47,8 +47,22 @@ const generateRegion1 = () => {
 			randomNumbers.pop()
 		}
 	}
+	/* Add region numbers to overall gameboard array */
+	pushRegionToGameBoard(board_region_1.value)
+	generateRegion2()
+}
 
-	gameBoard.value.push(...board_region_1.value)
+const generateRegion2 = () => {
+	let randomNumbers = generateNumbers()
+
+	for (let column = 0; column <= 2; column++) {
+		for (let row = 1; row <= 3; row++) {
+			/* row + 3 indicates the first square of region 2 (4) */
+			board_region_2.value[row + 3 + 9 * column] = randomNumbers.slice(-1)
+			randomNumbers.pop()
+		}
+	}
+	pushRegionToGameBoard(board_region_2.value)
 }
 /*************************************************
 *                     Helpers                    *
@@ -56,6 +70,13 @@ const generateRegion1 = () => {
 const generateNumbers = () => {
 	let randomNumbers = [1,2,3,4,5,6,7,8,9]
 	return randomNumbers.sort(() => Math.random() - 0.5)
+}
+
+const pushRegionToGameBoard = region => {
+	for (let i = 0; i < 9; i++) {
+		/* Get the key used in a region to know where to place the value in the overall gameboard */
+		gameBoard.value[Object.keys(region)[i]] = region[Object.keys(region)[i]]
+	}
 }
 
 initializeGame()
