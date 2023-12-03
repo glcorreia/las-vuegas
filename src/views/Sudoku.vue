@@ -93,12 +93,9 @@ const generateRegion3 = () => {
 	let filteredNumbers
 
 	for (let column = 0; column <= 2; column++) {
-		/**
-		@1st row region 1 | 2 > 1-4 | 4-7
-		@2nd row region 1 | 2 > 10-13 | 13-16
-		@3rd row region 1 | 2 > 19-22 | 22-25
-		*/
+		/* squares: 1-4, 10-13, 19-22 */
 		rowToCheck_region1 = board_region_1.value.slice(1 + (9 * column), 4 +(9 * column)).map(Number)
+		/* squares: 4-7, 13-16, 22-25 */
 		rowToCheck_region2 = board_region_2.value.slice(4 + (9 * column), 7 +(9 * column)).map(Number)
 	
 		filteredNumbers = randomNumbers
@@ -113,8 +110,45 @@ const generateRegion3 = () => {
 	}
 
 	pushRegionToGameBoard(board_region_3.value)
-	// generateRegion4()
+	generateRegion4()
 
+}
+
+const generateRegion4 = () => {
+	let randomNumbers = getRandomNumbers()
+	let columnToCheck = []
+	let usedNumbers = []
+	let filteredNumbers
+
+	for (let row = 1; row <= 3; row++) {
+		/* squares: 1,10,19, 2,11,20, 3,12,21 */
+		columnToCheck.push(board_region_1.value[row])
+		columnToCheck.push(board_region_1.value[row + 9])
+		columnToCheck.push(board_region_1.value[row + 18])
+
+		// console.log(columnToCheck.map(Number))
+		
+		filteredNumbers = randomNumbers
+		filteredNumbers = filteredNumbers.filter(num => !columnToCheck.map(Number).includes(num))
+		filteredNumbers = filteredNumbers.filter(num => !usedNumbers.map(Number).includes(num))
+	
+		for (let column = 0; column <= 2; column++) {
+			/* + 27 here is the first square of region 4 */
+			board_region_4.value[row + 27 + 9 * column] = filteredNumbers.slice(-1)
+			usedNumbers.push(filteredNumbers.slice(-1))
+			filteredNumbers.pop()
+		}
+		columnToCheck = []
+	}
+	/* Checks if all 9 numbers were used, if not, run function again */
+	if (usedNumbers[8] > 0) {
+		pushRegionToGameBoard(board_region_4.value)
+		// generateRegion5()
+	}
+	else {
+		console.log('mais uma moedinha')
+		generateRegion4()
+	} 
 }
 /*************************************************
 *                     Helpers                    *
