@@ -72,6 +72,7 @@ const generateRegion2 = () => {
 		filteredNumbers = filteredNumbers.filter(num => !usedNumbers.map(Number).includes(num))
 	
 		for (let row = 1; row <= 3; row++) {
+			/* + 3 here is the first square of region 2 */
 			board_region_2.value[row + 3 + 9 * column] = filteredNumbers.slice(-1)
 			usedNumbers.push(filteredNumbers.slice(-1))
 			filteredNumbers.pop()
@@ -87,9 +88,33 @@ const generateRegion2 = () => {
 
 const generateRegion3 = () => {
 	let randomNumbers = getRandomNumbers()
-	let rowToCheck = []
-	let usedNumbers = []
+	let rowToCheck_region1 = []
+	let rowToCheck_region2 = []
 	let filteredNumbers
+
+	for (let column = 0; column <= 2; column++) {
+		/**
+		@1st row region 1 | 2 > 1-4 | 4-7
+		@2nd row region 1 | 2 > 10-13 | 13-16
+		@3rd row region 1 | 2 > 19-22 | 22-25
+		*/
+		rowToCheck_region1 = board_region_1.value.slice(1 + (9 * column), 4 +(9 * column)).map(Number)
+		rowToCheck_region2 = board_region_2.value.slice(4 + (9 * column), 7 +(9 * column)).map(Number)
+	
+		filteredNumbers = randomNumbers
+		filteredNumbers = filteredNumbers.filter(num => !rowToCheck_region1.includes(num))
+		filteredNumbers = filteredNumbers.filter(num => !rowToCheck_region2.includes(num))
+	
+		for (let row = 1; row <= 3; row++) {
+			/* + 6 here is the first square of region 3 */
+			board_region_3.value[row + 6 + 9 * column] = filteredNumbers.slice(-1)
+			filteredNumbers.pop()
+		}
+	}
+
+	pushRegionToGameBoard(board_region_3.value)
+	// generateRegion4()
+
 }
 /*************************************************
 *                     Helpers                    *
@@ -143,7 +168,7 @@ a, a:hover {
 .grid-item {
 	width: 50px;
 	height: 50px;
-	margin: 0 0 -2px 0;
+	margin: 0 -2px -2px 0;
 	background-color: #8CD867;
 
 	/* Trick to align vertically */
