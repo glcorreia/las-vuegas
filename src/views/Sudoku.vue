@@ -19,6 +19,7 @@ import { RouterLink } from 'vue-router'
 
 /* Data */
 const gameBoard = ref(Array(100).fill(0))
+const baseNumbers = [1,2,3,4,5,6,7,8,9]
 const board_region_1 = ref([])
 const board_region_2 = ref([])
 const board_region_3 = ref([])
@@ -29,8 +30,6 @@ const board_region_7 = ref([])
 const board_region_8 = ref([])
 const board_region_9 = ref([])
 
-const randomNumbers = ref([])
-
 /*************************************************
 *                    Functions                   *
 *************************************************/
@@ -40,13 +39,13 @@ const initializeGame = () => {
 
 const generateRegion1 = () => {
 	/* Get randomized numbers */
-	randomNumbers.value = generateNumbers()
+	let randomNumbers = getRandomNumbers()
 
 	for (let column = 0; column <= 2; column++) {
 		for (let row = 1; row <= 3; row++) {
 			/* .slice(-1) gets the last item from an array .pop() removes it */
-			board_region_1.value[row + 9 * column] = randomNumbers.value.slice(-1)
-			randomNumbers.value.pop()
+			board_region_1.value[row + 9 * column] = randomNumbers.slice(-1)
+			randomNumbers.pop()
 		}
 	}
 	/* Add region numbers to overall gameboard array */
@@ -54,106 +53,37 @@ const generateRegion1 = () => {
 	generateRegion2()
 }
 
-const funcFunc = (keys, value) => {
-	let chaves = keys.map(value => parseInt(value, 10))
-	console.log(chaves)
-	console.log(value)
-
-	if (chaves.includes(value)) {
-		randomNumbers.value.unshift(randomNumbers.value.slice(-1))
-		randomNumbers.value.pop()
-		setTimeout(() => { funcFunc() }, 100)
-	}
-	else {
-		// not working
-		console.log(randomNumbers.value.slice(-1))
-		return randomNumbers.value.slice(-1)
-	}
-}
-
 const generateRegion2 = () => {
-	randomNumbers.value = generateNumbers()
+	let randomNumbers = getRandomNumbers()
+	let rowToCheck = []
+	let usedNumbers = []
+	let filteredNumbers
+
+	for (let column = 0; column <= 2; column++) {
+		rowToCheck = board_region_1.value.slice(1 + (9*column),4+(9*column)).map(Number)
 	
-	let row = 1
-	let rowToCheck = board_region_1.value.slice(1, 4)
-
-	for (let column = 0; column < 1; column++) {
-		board_region_2.value[row + 3 + 9 * column] = funcFunc(rowToCheck, parseInt(randomNumbers.value.slice(-1)))
+		filteredNumbers = randomNumbers
+		filteredNumbers = filteredNumbers.filter(num => !rowToCheck.includes(num))
+		filteredNumbers = filteredNumbers.filter(num => !usedNumbers.map(Number).includes(num))
+	
+		for (let row = 1; row <= 3; row++) {
+			board_region_2.value[row + 3 + 9 * column] = filteredNumbers.slice(-1)
+			usedNumbers.push(filteredNumbers.slice(-1))
+			filteredNumbers.pop()
+		}
 	}
-	// 	while (parseInt(Object.values(board_region_1.value[1 + 9 * column])) === randomNumbers.value.slice(-1) ||
-	// 			parseInt(Object.values(board_region_1.value[2 + 9 * column])) === randomNumbers.value.slice(-1) ||
-	// 			parseInt(Object.values(board_region_1.value[3 + 9 * column])) === randomNumbers.value.slice(-1)) {
-
-	// 		if (parseInt(Object.values(board_region_1.value[1 + 9 * column])) !== randomNumbers.value.slice(-1) &&
-	// 			parseInt(Object.values(board_region_1.value[2 + 9 * column])) !== randomNumbers.value.slice(-1) &&
-	// 			parseInt(Object.values(board_region_1.value[3 + 9 * column])) !== randomNumbers.value.slice(-1)) {
-	// 				console.log('conditions met', randomNumbers.value.slice(-1))
-	// 				board_region_2.value[row + 3 + 9 * column] = randomNumbers.value.slice(-1)
-	// 				console.log('entao?', Object.values(board_region_2.value[row + 3 + 9 * column]))
-	// 				randomNumbers.value.pop()
-	// 			}
-	// 		else {
-	// 			console.log('not met')	
-	// 			randomNumbers.value = moveLastNumberToStart()
-	// 			console.log('random numbers:', randomNumbers.value)
-	// 		}
-	// 		console.log(i)
-	// 		i += 1
-	// 	}
-	// }
-
-	// ----------------------------------------------------------------------------
-
-	// for (let column = 0; column < 2; column++) {
-	// 	for (let row = 1; row <= 3; row++) {
-	// 		let valueInRegion1 = parseInt(Object.values(board_region_1.value[row + 9 * column]))
-	// 		let valueInRegion2 = parseInt(Object.values(board_region_1.value[6]))
-	// 		let randomNumber = parseInt(randomNumbers.slice(-1))
-			
-
-			/* SÓ ESTÁ A COMPARAR COM A MESMA POSICAO, TEM DE COMPARAR COM A ROW TODA */
-			/* MERDA ABAIXO */
-			// while (!rowCleared) {
-			// 	console.log(parseInt(Object.values(board_region_1.value[1 + 9 * column])),'-',randomNumber)
-			// 	if (parseInt(Object.values(board_region_1.value[1 + 9 * column])) === randomNumber ||
-			// 		parseInt(Object.values(board_region_1.value[2 + 9 * column])) === randomNumber ||
-			// 		parseInt(Object.values(board_region_1.value[3 + 9 * column])) === randomNumber) {
-			// 			console.log('moved')
-			// 			moveLastNumberToStart(randomNumbers)
-			// 		}
-			// 	else {
-			// 		console.log('atao')
-			// 		rowCleared = true
-			// 	}
-			// }
-				
-				// board_region_2.value[row + 3 + 9 * column] = randomNumbers.slice(-1)
-				// randomNumbers.pop()
-
-			// if ( valueInRegion1 === randomNumber) {
-			// 	console.log(valueInRegion1, randomNumber, 'bur')
-
-			// 	moveLastNumberToStart(randomNumbers)
-
-			// 	board_region_2.value[row + 3 + 9 * column] = randomNumbers.slice(-1)
-			// 	randomNumbers.pop()
-			// }
-			// else {
-			// 	console.log('do not randomize')
-			// 	/* row + 3 indicates the first square of region 2 (4) */
-			// 	board_region_2.value[row + 3 + 9 * column] = randomNumbers.slice(-1)
-			// 	randomNumbers.pop()
-			// }
-	// 	}
-	// }
-	pushRegionToGameBoard(board_region_2.value)
+	/* Checks if numbers were used, if not, run function again */
+	if (usedNumbers?.[8] > 0) {
+		/* Add region numbers to overall gameboard array */
+		pushRegionToGameBoard(board_region_2.value)
+	}
+	else generateRegion2()
 }
 /*************************************************
 *                     Helpers                    *
 *************************************************/
-const generateNumbers = () => {
-	let randomNumbers = [1,2,3,4,5,6,7,8,9]
-	return randomNumbers.sort(() => Math.random() - 0.5)
+const getRandomNumbers = () => {
+	return [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5)
 }
 
 const pushRegionToGameBoard = region => {
@@ -201,14 +131,15 @@ a, a:hover {
 .grid-item {
 	width: 50px;
 	height: 50px;
-	margin: 0 0 0 0;
+	margin: 0 0 -2px 0;
 	background-color: #8CD867;
 
 	/* Trick to align vertically */
 	line-height: 50px;
-	/* -webkit-box-shadow:inset 0px 0px 0px 1px grey;
-	-moz-box-shadow:inset 0px 0px 0px 1px grey;
-	box-shadow:inset 0px 0px 0px 1px grey; */
+
+	-webkit-box-shadow:inset 0 0 2px 0 grey;
+	-moz-box-shadow:inset 0 0 2px 0 grey;
+	box-shadow:inset 0 0 2px 0 #808080;
 }
 .grid-item:hover {
 	background-color: #ED7D3A;
@@ -217,10 +148,10 @@ a, a:hover {
 .grid-item:nth-child(3n):not(:nth-child(9n)) {
 	border-right: 3px solid #000;
  }
- .grid-item:nth-child(n+19):nth-child(-n+27) {
-	border-bottom: 3px solid #000;
+ .grid-item:nth-child(n+28):nth-child(-n+36) {
+	border-top: 3px solid #000;
  }
- .grid-item:nth-child(n+46):nth-child(-n+54) {
-	border-bottom: 3px solid #000;
+ .grid-item:nth-child(n+55):nth-child(-n+63) {
+	border-top: 3px solid #000;
  }
 </style>
