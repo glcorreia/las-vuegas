@@ -60,7 +60,12 @@ const generateRegion2 = () => {
 	let filteredNumbers
 
 	for (let column = 0; column <= 2; column++) {
-		rowToCheck = board_region_1.value.slice(1 + (9*column),4+(9*column)).map(Number)
+		/**
+		@1st row is 1 to 4 exclusive -> 1 + (9 * 0) = 1 // 4 +(9 * 0) = 4
+		@2nd row is 10 to 13 exclusive -> 1 + (9 * 1) = 10 // 4 +(9 * 1) = 13
+		@3rd row is 19 to 22 exclusive -> 1 + (9 * 2) = 19 // 4 +(9 * 2) = 22
+		*/
+		rowToCheck = board_region_1.value.slice(1 + (9 * column), 4 +(9 * column)).map(Number)
 	
 		filteredNumbers = randomNumbers
 		filteredNumbers = filteredNumbers.filter(num => !rowToCheck.includes(num))
@@ -72,12 +77,19 @@ const generateRegion2 = () => {
 			filteredNumbers.pop()
 		}
 	}
-	/* Checks if numbers were used, if not, run function again */
-	if (usedNumbers?.[8] > 0) {
-		/* Add region numbers to overall gameboard array */
+	/* Checks if all 9 numbers were used, if not, run function again */
+	if (usedNumbers[8] > 0) {
 		pushRegionToGameBoard(board_region_2.value)
+		generateRegion3()
 	}
 	else generateRegion2()
+}
+
+const generateRegion3 = () => {
+	let randomNumbers = getRandomNumbers()
+	let rowToCheck = []
+	let usedNumbers = []
+	let filteredNumbers
 }
 /*************************************************
 *                     Helpers                    *
