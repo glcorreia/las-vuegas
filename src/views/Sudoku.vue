@@ -126,8 +126,6 @@ const generateRegion4 = () => {
 		columnToCheck.push(board_region_1.value[row + 9])
 		columnToCheck.push(board_region_1.value[row + 18])
 
-		// console.log(columnToCheck.map(Number))
-		
 		filteredNumbers = randomNumbers
 		filteredNumbers = filteredNumbers.filter(num => !columnToCheck.map(Number).includes(num))
 		filteredNumbers = filteredNumbers.filter(num => !usedNumbers.map(Number).includes(num))
@@ -143,12 +141,48 @@ const generateRegion4 = () => {
 	/* Checks if all 9 numbers were used, if not, run function again */
 	if (usedNumbers[8] > 0) {
 		pushRegionToGameBoard(board_region_4.value)
-		// generateRegion5()
+		generateRegion5()
 	}
-	else {
-		console.log('mais uma moedinha')
-		generateRegion4()
-	} 
+	else generateRegion4() 
+}
+
+const generateRegion5 = () => {
+	let randomNumbers = getRandomNumbers()
+	let rowToCheck = []
+	let columnToCheck = []
+	let usedNumbers = []
+	let filteredNumbers
+
+	for (let row = 1; row <= 3; row++) {
+		/* squares: 4,13,22, 5,14,23, 6,15,24 */
+		/* + 3 here is the first square of region 2 */
+		columnToCheck.push(board_region_2.value[row + 3])
+		columnToCheck.push(board_region_2.value[row + 3 + 9])
+		columnToCheck.push(board_region_2.value[row + 3 + 18])
+
+		filteredNumbers = randomNumbers
+		filteredNumbers = filteredNumbers.filter(num => !columnToCheck.map(Number).includes(num))
+		filteredNumbers = filteredNumbers.filter(num => !usedNumbers.map(Number).includes(num))
+
+		for (let column = 0; column <= 2; column++) {
+			/* squares: 28-30, 37-37, 46-48 */
+			/* + 27 here is the first square of region 4 */
+			rowToCheck = board_region_4.value.slice(1 + 27 + (9 * column), 4 + 27 +(9 * column)).map(Number)
+			filteredNumbers = filteredNumbers.filter(num => !rowToCheck.map(Number).includes(num))
+			console.log(filteredNumbers)
+
+			board_region_5.value[row + 3 + 27 + 9 * column] = filteredNumbers.slice(-1)
+			usedNumbers.push(filteredNumbers.slice(-1))
+			filteredNumbers.pop()
+		}
+		columnToCheck = []
+	}
+	/* Checks if all 9 numbers were used, if not, run function again */
+	// if (usedNumbers[8] > 0) {
+		pushRegionToGameBoard(board_region_5.value)
+	// 	// generateRegion6()
+	// }
+	// else generateRegion5() 
 }
 /*************************************************
 *                     Helpers                    *
@@ -162,12 +196,6 @@ const pushRegionToGameBoard = region => {
 		/* Get the key used in a region to know where to place the value in the overall gameboard */
 		gameBoard.value[Object.keys(region)[i]] = region[Object.keys(region)[i]]
 	}
-}
-
-const moveLastNumberToStart = () => {
-	/* slice(-1) gets the last number of an array and unshift() moves it to the start */
-	randomNumbers.value.unshift(randomNumbers.value.slice(-1))
-	randomNumbers.value.pop()
 }
 
 initializeGame()
