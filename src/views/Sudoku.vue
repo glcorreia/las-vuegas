@@ -74,8 +74,7 @@ const checkValidPosition = (region, position, currentNum) => {
 		switch (region + 1) {
 			case 1: {
 				/* Place current number, where available */
-				gameBoard.value[region][position] = currentNum
-				return
+				return gameBoard.value[region][position] = currentNum
 			}
 			case 2: {
 				/* Compare current number row position with previous region's row */
@@ -93,40 +92,55 @@ const checkValidPosition = (region, position, currentNum) => {
 				else return gameBoard.value[region][position] = currentNum
 			}
 			case 4: {
-				// comparar com region1 coluna
-				console.log('region 4')
-				gameBoard.value[region][position] = 1
-				return
+				/* Compare current number column position with above region's column */
+				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			case 5: {
-				// comparar com region2 coluna e region4 linha
-				console.log('region 5')
-				gameBoard.value[region][position] = 1
-				return
+				/* Compare current number column position with above region's column and previous region's row */
+				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			case 6: {
-				// comparar com region3 coluna e region 4 e 5 linha
-				console.log('region 6')
-				gameBoard.value[region][position] = 1
-				return
+				/* Compare current number column position with above region's column and 2 previous region's rows */
+				if (Math.floor(gameBoard.value[2].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
+					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			case 7: {
-				// comparar com region1 e 4 coluna
-				console.log('region 7')
-				gameBoard.value[region][position] = 1
-				return
+				/* Compare current number column position with 2 region's columns above */
+				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			case 8: {
-				// comparar com region2 e 5 coluna e region7 linha
-				console.log('region 8')
-				gameBoard.value[region][position] = 1
-				return
+				/* Compare current number column position with 2 region's column above and previous region's row */
+				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			case 9: {
-				// comparar com region3 e 6 coluna e region7 e 8 linha
-				console.log('region 9')
-				gameBoard.value[region][position] = 1
-			return
+				/* Compare current number column position with 2 region's column above and 2 previous region's rows */
+				if (Math.floor(gameBoard.value[2].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[5].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
+					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
+					Math.floor(gameBoard.value[7].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
+					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+				}
+				else return gameBoard.value[region][position] = currentNum
 			}
 			default: {
 				console.log('Something wrong')
