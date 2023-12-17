@@ -25,6 +25,7 @@ import { RouterLink } from 'vue-router'
 
 /* Data */
 const gameBoard = ref(Array.from({ length: 9 }, () => Array(9).fill(0)))
+const validPositions = ref([])
 
 /*************************************************
 *                    Functions                   *
@@ -34,43 +35,35 @@ const initializeGame = () => {
 }
 
 const populateBoard = () => {
-	let randomPosition
-	let currentNum = 1
-	
-	for (let region = 0; region < 9; region++) {
-		
-		/* Get a random number 1 to 9 to use as region index */
-		randomPosition = Math.floor(Math.random() * 9 )
-		checkValidPosition(region, randomPosition, currentNum)
-
-		// if (region === 0) {
-		// 	gameBoard.value[region][randomPosition] = 1
-		// 	console.log('region',region,'position',randomPosition,'module',randomPosition%3,'value',gameBoard.value[region][randomPosition])
-		// }
-		// else {
-		// 	checkValidPosition(region, randomPosition)
-		// }
-		// gameBoard.value[region][x] = x
-		// column2: 1,4,7 column2: 2,5,8 column3: 3,6,9
-		// console.log('region',region,'position',x,'module',x%3,'value',gameBoard.value[region][x])
-		// x++
-		
+	for (let currentNum = 1; currentNum <= 9; currentNum++) {
+		for (let region = 0; region < 9; region++) {
+			/* Check for valid (random) position of current number in region */
+			checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+		}
 	}
-	// console.log(gameBoard.value)
+}
+
+const availableSquares = region => {
+	/* Get an array of available positions in this region */
+	return validPositions.value = gameBoard.value[region]
+				.map((value, index) => ({ value, index }))
+				.filter(item => item.value === 0)
+				.map(item => item.index)
+				.map(Number)
 }
 
 const checkValidPosition = (region, position, currentNum) => {
-	/* Get an array of available positions in this region */
-	let availableSquares = gameBoard.value[region]
-		.map((value, index) => ({ value, index }))
-		.filter(item => item.value === 0)
-		.map(item => item.index)
+	let filteredPosition
+	availableSquares(region)
+	
+	const newRandomPosition = () => {
+		availableSquares(region)
+		filteredPosition = Math.floor(Math.random() * validPositions.value.length)
+		checkValidPosition(region, validPositions.value[filteredPosition], currentNum)
+	}
 
-	// console.log(availableSquares)
-	// console.log(position)
-	// console.log(availableSquares.includes(position))
-
-	if (availableSquares.includes(position)) {
+	console.log(validPositions.value.length)
+	if (validPositions.value.map(Number).includes(position)) {
 		switch (region + 1) {
 			case 1: {
 				/* Place current number, where available */
@@ -79,7 +72,10 @@ const checkValidPosition = (region, position, currentNum) => {
 			case 2: {
 				/* Compare current number row position with previous region's row */
 				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					availableSquares(region)
+					filteredPosition = Math.floor(Math.random() * validPositions.value.length)
+					checkValidPosition(region, validPositions.value[filteredPosition], currentNum)
+					return
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -87,14 +83,21 @@ const checkValidPosition = (region, position, currentNum) => {
 				/* Compare current number row position with 2 previous region's rows */
 				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
 					Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					console.log(validPositions.value)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
 			case 4: {
 				/* Compare current number column position with above region's column */
 				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -102,7 +105,10 @@ const checkValidPosition = (region, position, currentNum) => {
 				/* Compare current number column position with above region's column and previous region's row */
 				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -111,7 +117,10 @@ const checkValidPosition = (region, position, currentNum) => {
 				if (Math.floor(gameBoard.value[2].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
 					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -119,7 +128,10 @@ const checkValidPosition = (region, position, currentNum) => {
 				/* Compare current number column position with 2 region's columns above */
 				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -128,7 +140,10 @@ const checkValidPosition = (region, position, currentNum) => {
 				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -138,7 +153,10 @@ const checkValidPosition = (region, position, currentNum) => {
 					Math.floor(gameBoard.value[5].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
 					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
 					Math.floor(gameBoard.value[7].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					return checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+					console.log('error in switch', region+1)
+					// newRandomPosition()
+					return
+					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
 				}
 				else return gameBoard.value[region][position] = currentNum
 			}
@@ -149,15 +167,13 @@ const checkValidPosition = (region, position, currentNum) => {
 		}
 	}
 	else {
-		console.log('position taken')
-		/* If this position is taken, try another random one */
-		checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+		/* If this position is taken, try another random one from the validPositions array */
+		console.log('error in else',region,position,currentNum)
+		newRandomPosition()
+		return
 	}
 
-	console.log('region',region+1,'pos',position+1,'col',position%3+1,'row',Math.floor(position/3+1))
-	// if (position%3 === 1 || position%3 === 4 || position%3 === 7 ) console.log('region',region+1,'column1')
-	// if (position%3 === 2 || position%3 === 5 || position%3 === 8 ) console.log('region',region+1,'column2')
-	// if (position%3 === 3 || position%3 === 6 || position%3 === 9 ) console.log('region',region+1,'column3')
+	
 }
 
 
