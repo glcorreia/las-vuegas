@@ -5,7 +5,7 @@
 		<div class="grid-container">
 			<div v-for="(region,regionIndex) in 9" :key="region" class="grid-region">
 				<div v-for="(square,squareIndex) in 9" :key="square" class="grid-square">
-					{{ gameBoard[regionIndex][squareIndex] !== 0 ? gameBoard[regionIndex][squareIndex]: '' }}
+					{{ gameBoard[regionIndex][squareIndex] !== 0 ? gameBoard[regionIndex][squareIndex] : '' }}
 				</div>
 			</div>
 		</div>
@@ -35,10 +35,10 @@ const initializeGame = () => {
 }
 
 const populateBoard = () => {
-	for (let currentNum = 1; currentNum <= 9; currentNum++) {
-		for (let region = 0; region < 9; region++) {
-			/* Check for valid (random) position of current number in region */
-			checkValidPosition(region, Math.floor(Math.random() * 9 ), currentNum)
+	for (let region = 0; region < 9; region++) {
+		for (let currentNum = 1; currentNum <= 9; currentNum++) {
+			/* Check sfor valid position of current number in current region */
+			checkValidPosition(region, currentNum)
 		}
 	}
 }
@@ -52,134 +52,120 @@ const availableSquares = region => {
 				.map(Number)
 }
 
-const checkValidPosition = (region, position, currentNum) => {
-	let filteredPosition
+const checkValidPosition = (region, currentNum) => {
+	let filteredPosition = []
+	let filteredRows = []
+	let filteredCols = []
 	availableSquares(region)
 	
-	const newRandomPosition = () => {
-		availableSquares(region)
-		filteredPosition = Math.floor(Math.random() * validPositions.value.length)
-		checkValidPosition(region, validPositions.value[filteredPosition], currentNum)
-	}
-
-	console.log(validPositions.value.length)
-	if (validPositions.value.map(Number).includes(position)) {
-		switch (region + 1) {
-			case 1: {
-				/* Place current number, where available */
-				return gameBoard.value[region][position] = currentNum
-			}
-			case 2: {
-				/* Compare current number row position with previous region's row */
-				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					availableSquares(region)
-					filteredPosition = Math.floor(Math.random() * validPositions.value.length)
-					checkValidPosition(region, validPositions.value[filteredPosition], currentNum)
-					return
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 3: {
-				/* Compare current number row position with 2 previous region's rows */
-				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
-					Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					console.log('error in switch', region+1)
-					console.log(validPositions.value)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 4: {
-				/* Compare current number column position with above region's column */
-				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 5: {
-				/* Compare current number column position with above region's column and previous region's row */
-				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 6: {
-				/* Compare current number column position with above region's column and 2 previous region's rows */
-				if (Math.floor(gameBoard.value[2].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
-					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 7: {
-				/* Compare current number column position with 2 region's columns above */
-				if (Math.floor(gameBoard.value[0].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[3].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 8: {
-				/* Compare current number column position with 2 region's column above and previous region's row */
-				if (Math.floor(gameBoard.value[1].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[4].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			case 9: {
-				/* Compare current number column position with 2 region's column above and 2 previous region's rows */
-				if (Math.floor(gameBoard.value[2].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[5].findIndex(num => num === currentNum)%3+1) === Math.floor(position%3+1) ||
-					Math.floor(gameBoard.value[6].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1) ||
-					Math.floor(gameBoard.value[7].findIndex(num => num === currentNum)/3+1) === Math.floor(position/3+1)) {
-					console.log('error in switch', region+1)
-					// newRandomPosition()
-					return
-					// return checkValidPosition(region, Math.floor(Math.random() * availableSquares(region).length), currentNum)
-				}
-				else return gameBoard.value[region][position] = currentNum
-			}
-			default: {
-				console.log('Something wrong')
-				return
-			}
+	switch (region + 1) {
+		case 1: {
+			/* Place current number, where available */
+			filteredPosition = shuffle(validPositions.value)
+			break
+		}
+		case 2: {
+			/* Compare current number row position with previous region's row */
+			filteredRows.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in rows previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 3: {
+			/* Compare current number row position with 2 previous region's rows */
+			filteredRows.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)/3+1))
+			filteredRows.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in rows previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 4: {
+			/* Compare current number column position with above region's column */
+			filteredCols.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)%3+1))
+			/* Removes all positions that are in rows previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 5: {
+			/* Compare current number column position with above region's column and previous region's row */
+			filteredCols.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)%3+1))
+			filteredRows.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in columns previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			/* Removes all the remainder positions that are in rows previously used */
+			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 6: {
+			/* Compare current number column position with above region's column and 2 previous region's rows */
+			filteredCols.push(Math.floor(gameBoard.value[2].findIndex(el => el === currentNum)%3+1))
+			filteredRows.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)/3+1))
+			filteredRows.push(Math.floor(gameBoard.value[4].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in columns previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			/* Removes all the remainder positions that are in rows previously used */
+			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 7: {
+			/* Compare current number column position with 2 region's columns above */
+			filteredCols.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)%3+1))
+			filteredCols.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)%3+1))
+			/* Removes all positions that are in rows previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 8: {
+			/* Compare current number column position with 2 region's column above and previous region's row */
+			filteredCols.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)%3+1))
+			filteredCols.push(Math.floor(gameBoard.value[4].findIndex(el => el === currentNum)%3+1))
+			filteredRows.push(Math.floor(gameBoard.value[6].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in columns previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			/* Removes all the remainder positions that are in rows previously used */
+			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
+		}
+		case 9: {
+			/* Compare current number column position with 2 region's column above and 2 previous region's rows */
+			filteredCols.push(Math.floor(gameBoard.value[2].findIndex(el => el === currentNum)%3+1))
+			filteredCols.push(Math.floor(gameBoard.value[5].findIndex(el => el === currentNum)%3+1))
+			filteredRows.push(Math.floor(gameBoard.value[6].findIndex(el => el === currentNum)/3+1))
+			filteredRows.push(Math.floor(gameBoard.value[7].findIndex(el => el === currentNum)/3+1))
+			/* Removes all positions that are in columns previously used */
+			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
+			/* Removes all the remainder positions that are in rows previously used */
+			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
+			filteredPosition = shuffle(filteredPosition)
+			break
 		}
 	}
-	else {
-		/* If this position is taken, try another random one from the validPositions array */
-		console.log('error in else',region,position,currentNum)
-		newRandomPosition()
-		return
-	}
-
-	
+	gameBoard.value[region][filteredPosition[0]] = currentNum
 }
+
 
 
 /*************************************************
 *                     Helpers                    *
 *************************************************/
+/* Fisher-Yates shuffle */
+const shuffle = (array) => {
+	for (let i = array.length -1; i > 0; i--) {
+		let j = Math.floor(Math.random() * (i+1))
+		let k = array[i]
+		array[i] = array[j]
+		array[j] = k
+	}
+	return array
+}
+
 initializeGame()
 </script>
 
