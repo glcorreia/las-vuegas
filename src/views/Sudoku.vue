@@ -24,133 +24,47 @@ import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 /* Data */
-const gameBoard = ref(Array.from({ length: 9 }, () => Array(9).fill(0)))
-const validPositions = ref([])
+const gameBoardSolved = ref([
+	[1,2,3,4,5,6,7,8,9],
+	[4,5,6,7,8,9,1,2,3],
+	[7,8,9,1,2,3,4,5,6],
+	[2,3,1,5,6,4,8,9,7],
+	[5,6,4,8,9,7,2,3,1],
+	[8,9,7,2,3,1,5,6,4],
+	[3,1,2,6,4,5,9,7,8],
+	[6,4,5,9,7,8,3,1,2],
+	[9,7,8,3,1,2,6,4,5]
+])
+const gameBoard = ref([[],[],[],[],[],[],[],[],[]])
+const numbers = ref([1,2,3,4,5,6,7,8,9])
 
 /*************************************************
 *                    Functions                   *
 *************************************************/
+/**
+@trocar [X] todos os numeros, por ex, todos os 1s por 5s (sendo que este 5 é retirado de um array de 1 a 9 shuffled)
+@randomizar [ ] ordem das rows 0,1,2, 3,4,5, 6,7,8
+@randomizar [ ] ordem cols 0,1,2, 3,4,5, 6,7,8
+@randomizar [ ] blocos de rows 0-2, 3-5, 6-8
+@randomizar [ ] blocos de cols 0-2, 3-5, 6-8
+@profit [ ]
+*/
+
+
 const initializeGame = () => {
-	populateBoard()
-}
-
-const populateBoard = () => {
-	for (let region = 0; region < 9; region++) {
-		for (let currentNum = 1; currentNum <= 9; currentNum++) {
-			/* Check sfor valid position of current number in current region */
-			checkValidPosition(region, currentNum)
-		}
-	}
-}
-
-const availableSquares = region => {
-	/* Get an array of available positions in this region */
-	return validPositions.value = gameBoard.value[region]
-				.map((value, index) => ({ value, index }))
-				.filter(item => item.value === 0)
-				.map(item => item.index)
-				.map(Number)
-}
-
-const checkValidPosition = (region, currentNum) => {
-	let filteredPosition = []
-	let filteredRows = []
-	let filteredCols = []
-	availableSquares(region)
+	/* Shuffle numbers array */
+	numbers.value = shuffle(numbers.value)
 	
-	switch (region + 1) {
-		case 1: {
-			/* Place current number, where available */
-			filteredPosition = shuffle(validPositions.value)
-			break
-		}
-		case 2: {
-			/* Compare current number row position with previous region's row */
-			filteredRows.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in rows previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 3: {
-			/* Compare current number row position with 2 previous region's rows */
-			filteredRows.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)/3+1))
-			filteredRows.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in rows previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 4: {
-			/* Compare current number column position with above region's column */
-			filteredCols.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)%3+1))
-			/* Removes all positions that are in rows previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 5: {
-			/* Compare current number column position with above region's column and previous region's row */
-			filteredCols.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)%3+1))
-			filteredRows.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in columns previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			/* Removes all the remainder positions that are in rows previously used */
-			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 6: {
-			/* Compare current number column position with above region's column and 2 previous region's rows */
-			filteredCols.push(Math.floor(gameBoard.value[2].findIndex(el => el === currentNum)%3+1))
-			filteredRows.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)/3+1))
-			filteredRows.push(Math.floor(gameBoard.value[4].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in columns previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			/* Removes all the remainder positions that are in rows previously used */
-			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 7: {
-			/* Compare current number column position with 2 region's columns above */
-			filteredCols.push(Math.floor(gameBoard.value[0].findIndex(el => el === currentNum)%3+1))
-			filteredCols.push(Math.floor(gameBoard.value[3].findIndex(el => el === currentNum)%3+1))
-			/* Removes all positions that are in rows previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 8: {
-			/* Compare current number column position with 2 region's column above and previous region's row */
-			filteredCols.push(Math.floor(gameBoard.value[1].findIndex(el => el === currentNum)%3+1))
-			filteredCols.push(Math.floor(gameBoard.value[4].findIndex(el => el === currentNum)%3+1))
-			filteredRows.push(Math.floor(gameBoard.value[6].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in columns previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			/* Removes all the remainder positions that are in rows previously used */
-			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
-		}
-		case 9: {
-			/* Compare current number column position with 2 region's column above and 2 previous region's rows */
-			filteredCols.push(Math.floor(gameBoard.value[2].findIndex(el => el === currentNum)%3+1))
-			filteredCols.push(Math.floor(gameBoard.value[5].findIndex(el => el === currentNum)%3+1))
-			filteredRows.push(Math.floor(gameBoard.value[6].findIndex(el => el === currentNum)/3+1))
-			filteredRows.push(Math.floor(gameBoard.value[7].findIndex(el => el === currentNum)/3+1))
-			/* Removes all positions that are in columns previously used */
-			filteredPosition = validPositions.value.filter(el => !filteredCols.includes(Math.floor(el%3+1)))
-			/* Removes all the remainder positions that are in rows previously used */
-			filteredPosition = filteredPosition.filter(el => !filteredRows.includes(Math.floor(el/3+1)))
-			filteredPosition = shuffle(filteredPosition)
-			break
+	/* Replace all numbers for random ones */
+	for (let currentNumber = 0; currentNumber < 9; currentNumber++) {
+		for (let region = 0; region < 9; region++) {
+			/* Find where currentNumber is in the solved board */
+			let oldNumberIndex = gameBoardSolved.value[region].indexOf(currentNumber + 1)
+			/* Populate the game board with the replaced random number */
+			gameBoard.value[region][oldNumberIndex] = numbers.value[currentNumber]
 		}
 	}
-	gameBoard.value[region][filteredPosition[0]] = currentNum
 }
-
-
 
 /*************************************************
 *                     Helpers                    *
