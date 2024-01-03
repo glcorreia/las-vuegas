@@ -5,7 +5,7 @@
 		<div class="grid-container">
 			<div v-for="(region,regionIndex) in 9" :key="region" class="grid-region">
 				<div v-for="(square,squareIndex) in 9" :key="square" class="grid-square">
-					{{ gameBoard[regionIndex][squareIndex] !== 0 ? gameBoard[regionIndex][squareIndex] : '' }}
+					{{ gameBoard[regionIndex][squareIndex] }}
 				</div>
 			</div>
 		</div>
@@ -18,22 +18,34 @@
 
 <script setup>
 /* Vue */
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 /* Assets & Helpers */
 import { RouterLink } from 'vue-router'
 
 /* Data */
+// const gameBoardSolved = ref([
+// 	[1,2,3,4,5,6,7,8,9],
+// 	[4,5,6,7,8,9,1,2,3],
+// 	[7,8,9,1,2,3,4,5,6],
+// 	[2,3,1,5,6,4,8,9,7],
+// 	[5,6,4,8,9,7,2,3,1],
+// 	[8,9,7,2,3,1,5,6,4],
+// 	[3,1,2,6,4,5,9,7,8],
+// 	[6,4,5,9,7,8,3,1,2],
+// 	[9,7,8,3,1,2,6,4,5]
+// ])
+
 const gameBoardSolved = ref([
-	[1,2,3,4,5,6,7,8,9],
-	[4,5,6,7,8,9,1,2,3],
-	[7,8,9,1,2,3,4,5,6],
-	[2,3,1,5,6,4,8,9,7],
-	[5,6,4,8,9,7,2,3,1],
-	[8,9,7,2,3,1,5,6,4],
-	[3,1,2,6,4,5,9,7,8],
-	[6,4,5,9,7,8,3,1,2],
-	[9,7,8,3,1,2,6,4,5]
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3],
+	[1,1,1,2,2,2,3,3,3]
 ])
 const gameBoard = ref([[],[],[],[],[],[],[],[],[]])
 const numbers = ref([1,2,3,4,5,6,7,8,9])
@@ -53,17 +65,34 @@ const numbers = ref([1,2,3,4,5,6,7,8,9])
 
 const initializeGame = () => {
 	/* Shuffle numbers array */
-	numbers.value = shuffle(numbers.value)
-	
+	// numbers.value = shuffle(numbers.value)
+
+	gameBoard.value = gameBoardSolved.value
 	/* Replace all numbers for random ones */
-	for (let currentNumber = 0; currentNumber < 9; currentNumber++) {
-		for (let region = 0; region < 9; region++) {
-			/* Find where currentNumber is in the solved board */
-			let oldNumberIndex = gameBoardSolved.value[region].indexOf(currentNumber + 1)
-			/* Populate the game board with the replaced random number */
-			gameBoard.value[region][oldNumberIndex] = numbers.value[currentNumber]
-		}
+	// for (let currentNumber = 0; currentNumber < 9; currentNumber++) {
+	// 	for (let region = 0; region < 9; region++) {
+	// 		/* Find where currentNumber is in the solved board */
+	// 		let oldNumberIndex = gameBoardSolved.value[region].indexOf(currentNumber + 1)
+	// 		/* Populate the game board with the replaced random number */
+	// 		gameBoard.value[region][oldNumberIndex] = numbers.value[currentNumber]
+	// 	}
+	// }
+
+	/* Shuffle rows by block */
+	/* Shuffles 3 blocks of numbers and merges/flattens them after */
+	let shuffledRows = [shuffle([[0,1,2],[3,4,5],[6,7,8]])].flat(2) //ES2019
+	let tempArray = []
+	
+	/* Shuffle block of rows */
+	// currently only doing this to first block out of 9
+	for (let i = 0; i < 9; i++) {
+		tempArray[i] = gameBoard.value[0][shuffledRows[i]]
 	}
+	gameBoard.value[0] = tempArray
+	console.log(tempArray)
+	//gameBoard.value = shuffledRows
+	
+	// console.log(gameBoard.value)
 }
 
 /*************************************************
@@ -73,9 +102,9 @@ const initializeGame = () => {
 const shuffle = (array) => {
 	for (let i = array.length -1; i > 0; i--) {
 		let j = Math.floor(Math.random() * (i+1))
-		let k = array[i]
+		let temp = array[i]
 		array[i] = array[j]
-		array[j] = k
+		array[j] = temp
 	}
 	return array
 }
