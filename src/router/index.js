@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import TheMenu from '../views/TheMenu.vue'
 import TriPeaks from '../views/TriPeaks.vue'
-import Mahjong from '../views/Mahjong.vue'
 import Sudoku from '../views/Sudoku.vue'
+import SlotMachine from '../views/SlotMachine.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,9 +20,9 @@ const router = createRouter({
 			component: TriPeaks
 		},
 		{
-			path: '/mahjong',
-			name: 'mahjong',
-			component: Mahjong
+			path: '/slotmachine',
+			name: 'slotmachine',
+			component: SlotMachine
 		},
 		{
 			path: '/sudoku',

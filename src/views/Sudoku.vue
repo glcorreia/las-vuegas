@@ -89,10 +89,6 @@ const initializeGame = () => {
 		tempArray[i] = gameBoard.value[0][shuffledRows[i]]
 	}
 	gameBoard.value[0] = tempArray
-	console.log(tempArray)
-	//gameBoard.value = shuffledRows
-	
-	// console.log(gameBoard.value)
 }
 
 /*************************************************

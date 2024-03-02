@@ -8,9 +8,9 @@
 			<RouterLink to="/sudoku">
 				<div class="item available">Sudoku</div>
 			</RouterLink>
-			<!-- <RouterLink to="/mahjong"> -->
-				<div class="item">???</div>
-			<!-- </RouterLink> -->
+			<RouterLink to="/slotmachine">
+				<div class="item available">Slots</div>
+			</RouterLink>
 		</div>
 	</div>
 </template>
