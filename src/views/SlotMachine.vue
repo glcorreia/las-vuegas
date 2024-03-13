@@ -1,6 +1,6 @@
 <template>
-	<div class="wrapper">
-		<h1>Slot Machine</h1>
+	<!-- <div class="wrapper">
+		<h1>Slot Machine</h1> -->
 		<!-- Content -->
 		<div class="slots">
 			<div class="reel"></div>
@@ -10,15 +10,15 @@
 
 		<!-- <img src="../assets/images/slotreel.webp" style="position:fixed; left:0; top:0; height: 100vh; width: auto;"> -->
 		
-		<div>
+		<!-- <div>
 			<RouterLink to="/">« Go Back</RouterLink>
 		</div>
-	</div>
+	</div> -->
 </template>
 
 <script setup>
 /* Vue */
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 /* Assets & Helpers */
 import { RouterLink } from 'vue-router'
@@ -28,7 +28,23 @@ const icon_width = ref(79)
 const icon_height = ref(79)
 const num_icons = ref(9)
 const indexes = ref[0, 0, 0]
+const reels = ref([])
 
+const roll = (reel, offset = 0) => {
+	const delta = (offset + 2) * num_icons.value + Math.round(Math.random() * num_icons.value)
+}
+
+const rollAll = () => {
+	console.log(reels.value)
+}
+
+onMounted(()=>{
+	const reelsList = document.querySelectorAll('.reel')
+	reels.value = Array.from(reelsList)
+	console.log(reels.value)
+ })
+
+rollAll()
 </script>
 
 <style lang="scss" scoped>

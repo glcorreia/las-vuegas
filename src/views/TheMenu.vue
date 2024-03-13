@@ -6,10 +6,10 @@
 				<div class="item available">Tri-Peaks</div>
 			</RouterLink>
 			<RouterLink to="/sudoku">
-				<div class="item available">Sudoku</div>
+				<div class="item">Sudoku</div>
 			</RouterLink>
 			<RouterLink to="/slotmachine">
-				<div class="item available">Slots</div>
+				<div class="item">Slots</div>
 			</RouterLink>
 		</div>
 	</div>
