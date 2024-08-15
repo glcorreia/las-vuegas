@@ -8,7 +8,7 @@
 					<!-- <div>eaten piece ICON goes here</div> -->
 				</div>
 				<div class="grid-container">
-					<div
+					<!-- <div
 						v-for="position in 64"
 						:key="position"
 						class="grid-square"
@@ -16,7 +16,6 @@
 						@drop="onDrop(position)"
 						@dragover.prevent
 						@dragenter.prevent>
-						<!-- {{ labels(square) }} -->
 						<Pieces
 							v-if="gameBoard[position].pieceId"
 							:type="getPieceType(position)"
@@ -24,6 +23,23 @@
 							draggable
 							@dragstart="startDrag($event, position)"
 						/>
+					</div> -->
+					<div v-for="(row, rowIndex) in 8" :key="rowIndex">
+						<div
+						v-for="(col, colIndex) in 8"
+						:key="colIndex"
+						class="grid-square"
+						@click="positionClickHandler(rowIndex, colIndex)"
+						@drop="onDrop(rowIndex, colIndex)"
+						@dragover.prevent
+						@dragenter.prevent>
+							<Pieces
+							v-if="gameBoard[rowIndex][colIndex].pieceId"
+							:type="getPieceType(rowIndex, colIndex)"
+							:color="getPieceColor(rowIndex, colIndex)"
+							draggable
+							@dragstart="startDrag($event, rowIndex, colIndex)"/>
+						</div>
 					</div>
 				</div>
 				<div class="eaten-black">
@@ -40,133 +56,136 @@
 import { ref, computed, defineAsyncComponent } from 'vue'
 
 /* Helpers */
+// labels(square)
 // import labels from '../helpers/chess'
 
 /* Assets */
 import Pieces from '../components/chess/Pieces.vue'
 
 /* Data */
-const gameBoard = ref([])
+const gameBoard = ref(Array(8).fill(null).map(() =>
+	Array(8).fill(null).map(() =>
+		({ object: null }))
+))
 
 const pieces = ref([
 	/* White pieces */
-	{ id: 1, color: 'white', type: 'pawn', position: 49, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 2, color: 'white', type: 'pawn', position: 50, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 3, color: 'white', type: 'pawn', position: 51, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 4, color: 'white', type: 'pawn', position: 52, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 5, color: 'white', type: 'pawn', position: 53, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 6, color: 'white', type: 'pawn', position: 54, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 7, color: 'white', type: 'pawn', position: 55, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 8, color: 'white', type: 'pawn', position: 56, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 9, color: 'white', type: 'rook', position: 57, hasMoved: false, hasMoved: false },
-	{ id: 10, color: 'white', type: 'knight', position: 58 },
-	{ id: 11, color: 'white', type: 'bishop', position: 59 },
-	{ id: 12, color: 'white', type: 'queen', position: 60 },
-	{ id: 13, color: 'white', type: 'king', position: 61, hasMoved: false, inCheck: false },
-	{ id: 14, color: 'white', type: 'bishop', position: 62 },
-	{ id: 15, color: 'white', type: 'knight', position: 63 },
-	{ id: 16, color: 'white', type: 'rook', position: 64, hasMoved: false },
+	{ id: 1, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 2, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 3, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 4, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 5, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 6, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 7, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 8, color: 'white', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 9, color: 'white', type: 'rook', eaten: false, hasMoved: false, hasMoved: false },
+	{ id: 10, color: 'white', type: 'knight', eaten: false },
+	{ id: 11, color: 'white', type: 'bishop', eaten: false },
+	{ id: 12, color: 'white', type: 'queen', eaten: false },
+	{ id: 13, color: 'white', type: 'king', eaten: false, hasMoved: false, inCheck: false },
+	{ id: 14, color: 'white', type: 'bishop', eaten: false },
+	{ id: 15, color: 'white', type: 'knight', eaten: false },
+	{ id: 16, color: 'white', type: 'rook', eaten: false, hasMoved: false },
 	/* Black pieces */
-	{ id: 17, color: 'black', type: 'pawn', position: 9, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 18, color: 'black', type: 'pawn', position: 10, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 19, color: 'black', type: 'pawn', position: 11, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 20, color: 'black', type: 'pawn', position: 12, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 21, color: 'black', type: 'pawn', position: 13, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 22, color: 'black', type: 'pawn', position: 14, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 23, color: 'black', type: 'pawn', position: 15, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 24, color: 'black', type: 'pawn', position: 16, hasMoved: false, enPassant: false, promotion: false },
-	{ id: 25, color: 'black', type: 'rook', position: 1, hasMoved: false },
-	{ id: 26, color: 'black', type: 'knight', position: 2 },
-	{ id: 27, color: 'black', type: 'bishop', position: 3 },
-	{ id: 28, color: 'black', type: 'queen', position: 4 },
-	{ id: 29, color: 'black', type: 'king', position: 5, hasMoved: false, inCheck: false },
-	{ id: 30, color: 'black', type: 'bishop', position: 6 },
-	{ id: 31, color: 'black', type: 'knight', position: 7 },
-	{ id: 32, color: 'black', type: 'rook', position: 8, hasMoved: false }
+	{ id: 17, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 18, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 19, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 20, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 21, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 22, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 23, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 24, color: 'black', type: 'pawn', eaten: false, hasMoved: false, enPassant: false, promotion: false },
+	{ id: 25, color: 'black', type: 'rook', eaten: false, hasMoved: false },
+	{ id: 26, color: 'black', type: 'knight', eaten: false },
+	{ id: 27, color: 'black', type: 'bishop', eaten: false },
+	{ id: 28, color: 'black', type: 'queen', eaten: false },
+	{ id: 29, color: 'black', type: 'king', eaten: false, hasMoved: false, inCheck: false },
+	{ id: 30, color: 'black', type: 'bishop', eaten: false },
+	{ id: 31, color: 'black', type: 'knight', eaten: false },
+	{ id: 32, color: 'black', type: 'rook', eaten: false, hasMoved: false }
 ])
 
 /* Functions */
 const initializeGameBoard = () => {
-	for (let i = 0; i <= 64 ; i++) {
-		gameBoard.value[i] = {
-			/* id = 0 means it's empty */
-			pieceId: 0,
-		}
-	}
-
 	/* Black pieces */
-	gameBoard.value[1].pieceId = 25 // Rook
-	gameBoard.value[2].pieceId = 26 // Knight
-	gameBoard.value[3].pieceId = 27 // Bishop
-	gameBoard.value[4].pieceId = 28 // Queen
-	gameBoard.value[5].pieceId = 29 // King
-	gameBoard.value[6].pieceId = 30 // Bishop
-	gameBoard.value[7].pieceId = 31 // Knight
-	gameBoard.value[8].pieceId = 32 // Rook
-	gameBoard.value[9].pieceId = 17 // Pawn
-	gameBoard.value[10].pieceId = 18 // Pawn
-	gameBoard.value[11].pieceId = 19 // Pawn
-	gameBoard.value[12].pieceId = 20 // Pawn
-	gameBoard.value[13].pieceId = 21 // Pawn
-	gameBoard.value[14].pieceId = 22 // Pawn
-	gameBoard.value[15].pieceId = 23 // Pawn
-	gameBoard.value[16].pieceId = 24 // Pawn
+	gameBoard.value[0][0].pieceId = 25 // Rook
+	gameBoard.value[1][0].pieceId = 26 // Knight
+	gameBoard.value[2][0].pieceId = 27 // Bishop
+	gameBoard.value[3][0].pieceId = 28 // Queen
+	gameBoard.value[4][0].pieceId = 29 // King
+	gameBoard.value[5][0].pieceId = 30 // Bishop
+	gameBoard.value[6][0].pieceId = 31 // Knight
+	gameBoard.value[7][0].pieceId = 32 // Rook
+	gameBoard.value[0][1].pieceId = 17 // Pawn
+	gameBoard.value[1][1].pieceId = 18 // Pawn
+	gameBoard.value[2][1].pieceId = 19 // Pawn
+	gameBoard.value[3][1].pieceId = 20 // Pawn
+	gameBoard.value[4][1].pieceId = 21 // Pawn
+	gameBoard.value[5][1].pieceId = 22 // Pawn
+	gameBoard.value[6][1].pieceId = 23 // Pawn
+	gameBoard.value[7][1].pieceId = 24 // Pawn
 
 	/* White pieces */
-	gameBoard.value[49].pieceId = 1 // Pawn
-	gameBoard.value[50].pieceId = 2 // Pawn
-	gameBoard.value[51].pieceId = 3 // Pawn
-	gameBoard.value[52].pieceId = 4 // Pawn
-	gameBoard.value[53].pieceId = 5 // Pawn
-	gameBoard.value[54].pieceId = 6 // Pawn
-	gameBoard.value[55].pieceId = 7 // Pawn
-	gameBoard.value[56].pieceId = 8 // Pawn
-	gameBoard.value[57].pieceId = 9 // Rook
-	gameBoard.value[58].pieceId = 10 // Knight
-	gameBoard.value[59].pieceId = 11 // Bishop
-	gameBoard.value[60].pieceId = 12 // Queen
-	gameBoard.value[61].pieceId = 13 // King
-	gameBoard.value[62].pieceId = 14 // Bishop
-	gameBoard.value[63].pieceId = 15 // Knight
-	gameBoard.value[64].pieceId = 16 // Rook
+	gameBoard.value[0][6].pieceId = 1 // Pawn
+	gameBoard.value[1][6].pieceId = 1 // Pawn
+	gameBoard.value[2][6].pieceId = 2 // Pawn
+	gameBoard.value[3][6].pieceId = 3 // Pawn
+	gameBoard.value[4][6].pieceId = 4 // Pawn
+	gameBoard.value[5][6].pieceId = 5 // Pawn
+	gameBoard.value[6][6].pieceId = 6 // Pawn
+	gameBoard.value[7][6].pieceId = 7 // Pawn
+	gameBoard.value[0][7].pieceId = 8 // Pawn
+	gameBoard.value[0][7].pieceId = 9 // Rook
+	gameBoard.value[1][7].pieceId = 10 // Knight
+	gameBoard.value[2][7].pieceId = 11 // Bishop
+	gameBoard.value[3][7].pieceId = 12 // Queen
+	gameBoard.value[4][7].pieceId = 13 // King
+	gameBoard.value[5][7].pieceId = 14 // Bishop
+	gameBoard.value[6][7].pieceId = 15 // Knight
+	gameBoard.value[7][7].pieceId = 16 // Rook
 }
 
-const getPieceType = (positionId) => {
-	return pieces.value.find(piece => piece.id === gameBoard.value[positionId].pieceId).type
+const getPieceType = (row, col) => {
+	return pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).type
 }
 
-const getPieceColor = (positionId) => {
-	return pieces.value.find(piece => piece.id === gameBoard.value[positionId].pieceId).color
+const getPieceColor = (row, col) => {
+	return pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).color
 }
 
-const positionClickHandler = (position) => {
-	console.log(position, 'clicked')
+const positionClickHandler = (row, col) => {
+	/* Only continues if there's a piece on that square */
+	if (!!gameBoard.value[row][col].pieceId) {
+		/* Convert row to Letter, inverts cols and shows piece name */
+		console.log(String.fromCharCode(row + 65), Math.abs(col - 8) , pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).type)
+	}
 }
-
-
 
 /******************************
 *     DRAG AND DROP LOGIC     *
 ******************************/
 const movingPieceId = ref()
-const startingPosition = ref()
+const startingPosition = ref([])
 
-const startDrag = (evt, startPosition) => {
+const startDrag = (evt, startX, startY) => {
 	evt.dataTransfer.dropEffect = 'move'
 	evt.dataTransfer.effectAllowed = 'move'
 	/* Store id of the piece being dragged */
-	movingPieceId.value = gameBoard.value[startPosition].pieceId
+	movingPieceId.value = gameBoard.value[startX][startY].pieceId
 	/* Store starting position */
-	startingPosition.value = startPosition
+	startingPosition.value = [startX, startY]
 }
 
-const onDrop = (newPosition) => {
+const onDrop = (endX, endY) => {
+	const startX = startingPosition.value[0]
+	const startY = startingPosition.value[1]
+
 	/* If the piece ends up on the same position, don't do anything */
-	if (newPosition === startingPosition.value) return
-	/* Set new position for dragged piece */
-	gameBoard.value[newPosition].pieceId = movingPieceId.value
+	if (endX === startX && endY === startY) return
+	/* Save new position for dragged piece */
+	gameBoard.value[endX][endY].pieceId = movingPieceId.value
 	/* Clear previous position */
-	gameBoard.value[startingPosition.value].pieceId = 0
+	gameBoard.value[startX][startY].pieceId = 0
 	/* Reset moving piece id */
 	movingPieceId.value = 0
 }
@@ -227,40 +246,29 @@ a, a:hover {
 		display: grid;
 		grid-template-columns: repeat(8, var(--square-size));
 		grid-template-rows: repeat(8, var(--square-size));
-		width: fit-content;
-		overflow: hidden;
+
+		.grid-square {
+			width: var(--square-size);
+			height: var(--square-size);
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.grid-square:hover {
+			background-color: var(--square-focus) !important;
+		}
 	}
-	.grid-square {
-		width: var(--square-size);
-		height: var(--square-size);
-		padding-top: 8px;
 
-		background-color: var(--square-black);
-
-		/* Trick to align vertically */
-		line-height: var(--square-size);
+	.grid-container > div:nth-child(odd) .grid-square:nth-child(odd),
+	.grid-container > div:nth-child(even), .grid-square:nth-child(even) {
+		background-color:  var(--square-black);
 	}
 
-	.grid-square:nth-child(16n+2),
-	.grid-square:nth-child(16n+4),
-	.grid-square:nth-child(16n+6),
-	.grid-square:nth-child(16n+8),
-	.grid-square:nth-child(16n+9),
-	.grid-square:nth-child(16n+11),
-	.grid-square:nth-child(16n+13),
-	.grid-square:nth-child(16n+15) {
+	.grid-container > div:nth-child(odd) .grid-square:nth-child(even),
+	.grid-container > div:nth-child(even), .grid-square:nth-child(odd) {
 		background-color:  var(--square-white);
-	}
-
-	/* .grid-square:nth-child(9n+1),
-	.grid-square:nth-child(18n+1),
-	.grid-square:nth-child(n+73):nth-child(-n+81) {
-		background-color: var(--bg-color);
-		pointer-events: none;
-	} */
-
-	.grid-square:hover {
-		background-color: var(--square-focus);
 	}
 
 	.eaten-white {
