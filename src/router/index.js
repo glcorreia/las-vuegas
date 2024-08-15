@@ -4,6 +4,7 @@ import TheMenu from '../views/TheMenu.vue'
 import TriPeaks from '../views/TriPeaks.vue'
 import Sudoku from '../views/Sudoku.vue'
 import SlotMachine from '../views/SlotMachine.vue'
+import Chess from '../views/Chess.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,12 @@ const router = createRouter({
 			name: 'sudoku',
 			component: Sudoku
  		}
+		 ,
+		 {
+			 path: '/chess',
+			 name: 'chess',
+			 component: Chess
+		  }
 	]
 })
 

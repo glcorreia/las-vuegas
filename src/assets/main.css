@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap');
 
 body {
-	width: 90vw;
-	min-height: 90vh;
+	width: 100vw;
+	min-height: 100vh;
 	color: #363537;
 	background: #2FBF71;
 	line-height: 1.6;

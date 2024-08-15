@@ -8,8 +8,8 @@
 			<RouterLink to="/sudoku">
 				<div class="item">Sudoku</div>
 			</RouterLink>
-			<RouterLink to="/slotmachine">
-				<div class="item">Slots</div>
+			<RouterLink to="/chess">
+				<div class="item">Chess</div>
 			</RouterLink>
 		</div>
 	</div>
