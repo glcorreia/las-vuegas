@@ -100,14 +100,13 @@ const initializeGameBoard = () => {
 
 	/* White pieces */
 	gameBoard.value[0][6].pieceId = 1 // Pawn
-	gameBoard.value[1][6].pieceId = 1 // Pawn
-	gameBoard.value[2][6].pieceId = 2 // Pawn
-	gameBoard.value[3][6].pieceId = 3 // Pawn
-	gameBoard.value[4][6].pieceId = 4 // Pawn
-	gameBoard.value[5][6].pieceId = 5 // Pawn
-	gameBoard.value[6][6].pieceId = 6 // Pawn
-	gameBoard.value[7][6].pieceId = 7 // Pawn
-	gameBoard.value[0][7].pieceId = 8 // Pawn
+	gameBoard.value[1][6].pieceId = 2 // Pawn
+	gameBoard.value[2][6].pieceId = 3 // Pawn
+	gameBoard.value[3][6].pieceId = 4 // Pawn
+	gameBoard.value[4][6].pieceId = 5 // Pawn
+	gameBoard.value[5][6].pieceId = 6 // Pawn
+	gameBoard.value[6][6].pieceId = 7 // Pawn
+	gameBoard.value[7][6].pieceId = 8 // Pawn
 	gameBoard.value[0][7].pieceId = 9 // Rook
 	gameBoard.value[1][7].pieceId = 10 // Knight
 	gameBoard.value[2][7].pieceId = 11 // Bishop
@@ -174,12 +173,12 @@ const checkValidMoves = (startX, startY) => {
 				if (firstMove && pieceId(startX, startY-2) === 0) { possibleMoves.value.push([startX, startY-2]) } // 2 squares up
 			}
 			/* Black pieces (17-32) in range to be eaten */
-			if (startX === 0 && pieceId(startX+1, startY-1) >= 17 && pieceId(startX+1, startY-1) <= 32) { possibleMoves.value.push([startX+1, startY-1]) }
-			if (startX === 7 && pieceId(startX-1, startY-1) >= 17 && pieceId(startX-1, startY-1) <= 32) { possibleMoves.value.push([startX-1, startY-1]) }
+			if (startX === 0 && pieceId(startX+1, startY-1) >= 17) { possibleMoves.value.push([startX+1, startY-1]) }
+			if (startX === 7 && pieceId(startX-1, startY-1) >= 17) { possibleMoves.value.push([startX-1, startY-1]) }
 			/* Available black piece up and left */
-			if (startX > 0 && startX < 7 && pieceId(startX-1, startY-1) >= 17 && pieceId(startX-1, startY-1) <= 32) { possibleMoves.value.push([startX-1, startY-1]) }
+			if (startX > 0 && startX < 7 && pieceId(startX-1, startY-1) >= 17) { possibleMoves.value.push([startX-1, startY-1]) }
 			/* Available black piece up and right */
-			if (startX > 0 && startX < 7 && pieceId(startX+1, startY-1) >= 17 && pieceId(startX+1, startY-1) <= 32) { possibleMoves.value.push([startX+1, startY-1]) }
+			if (startX > 0 && startX < 7 && pieceId(startX+1, startY-1) >= 17) { possibleMoves.value.push([startX+1, startY-1]) }
 		}
 		if (color === 'black') { // todo: en passant
 			/* Regular move */
@@ -217,6 +216,77 @@ const checkValidMoves = (startX, startY) => {
 			if (startX-2 >= 0 && startY+1 <= 7 && pieceId(startX-2, startY+1) <= 16) { possibleMoves.value.push([startX-2, startY+1]) } // ↙
 			if (startX+2 <= 7 && startY-1 >= 0 && pieceId(startX+2, startY-1) <= 16) { possibleMoves.value.push([startX+2, startY-1]) } // ↗
 			if (startX+2 <= 7 && startY+1 <= 7 && pieceId(startX+2, startY+1) <= 16) { possibleMoves.value.push([startX+2, startY+1]) } // ↘
+		}
+	}
+
+	if (type === 'rook') {
+		if (color === 'white') {
+			/* Check left movements */
+			for (let i=startX-1; i >= 0; i--) {
+				if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(i, startY) >= 17) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check right movements */
+			for (let i=startX+1; i <= 7; i++) {
+				if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(i, startY) >= 17) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check up movements */
+			for (let i=startY-1; i >= 0; i--) {
+				if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(startX, i) >= 17) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check down movements */
+			for (let i=startY+1; i <= 7; i++) {
+				if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(startX, i) >= 17) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+		}
+		if (color === 'black') {
+			/* Check left movements */
+			for (let i=startX-1; i >= 0; i--) {
+				if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(i, startY) <= 16) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check right movements */
+			for (let i=startX+1; i <= 7; i++) {
+				if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(i, startY) <= 16) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check up movements */
+			for (let i=startY-1; i >= 0; i--) {
+				if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(startX, i) <= 16) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
+			/* Check down movements */
+			for (let i=startY+1; i <= 7; i++) {
+				if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+				else {
+					if (pieceId(startX, i) <= 16) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
+					break // stop if a piece is found
+				}
+			}
 		}
 	}
 	
