@@ -7,7 +7,7 @@
 				<div class="eaten-white">
 					<!-- <div>eaten piece ICON goes here</div> -->
 				</div>
-				<div class="grid-container">
+				<div class="grid-container" v-click-outside="clearHighlightedMoves">
 					<div v-for="(row, rowIndex) in 8" :key="rowIndex">
 						<div
 						v-for="(col, colIndex) in 8"
@@ -137,70 +137,64 @@ const initializeGameBoard = () => {
 }
 
 const getPieceType = (row, col) => {
-	return pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).type
+	return pieces.value.find(piece => piece.id === pieceId(row, col)).type
 }
 
 const getPieceColor = (row, col) => {
-	return pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).color
+	return pieces.value.find(piece => piece.id === pieceId(row, col)).color
 }
 
 const positionClickHandler = (row, col) => {
 	/* Only continues if there's a piece on that square */
-	if (!!gameBoard.value[row][col].pieceId) {
+	if (!!pieceId(row, col)) {
 		/* Convert row to Letter, inverts cols and shows piece name */
-		console.log(String.fromCharCode(row + 65), Math.abs(col - 8) , pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).type)
+		console.log(String.fromCharCode(row + 65), Math.abs(col - 8) , pieces.value.find(piece => piece.id === pieceId(row, col)).type)
 
 		checkValidMoves(row, col)
+	} else {
+		clearHighlightedMoves()
 	}
 }
+
+/* Simplifies searching which piece is where in the gameBoard */
+const pieceId = (row, col) => { return gameBoard.value[row][col].pieceId }
 
 const possibleMoves = ref([])
 const checkValidMoves = (startX, startY) => {
 	const type = getPieceType(startX, startY)
 	const color = getPieceColor(startX, startY)
-	const firstMove = !pieces.value.find(piece => piece.id === gameBoard.value[startX][startY].pieceId).hasMoved
+	const firstMove = !pieces.value.find(piece => piece.id === pieceId(startX, startY)).hasMoved
+	/* Resets previous moves */
 	possibleMoves.value = []
 
 	if (type === 'pawn') { // todo: en passant
 		if (color === 'white') {
 			/* Regular move */
-			if(startY-1 >= 0 && gameBoard.value[startX][startY-1].pieceId === 0) {
+			if(startY-1 >= 0 && pieceId(startX,startY-1) === 0) {
 				possibleMoves.value.push([startX, startY-1]) // 1 square up
-				if (firstMove && gameBoard.value[startX][startY-2].pieceId === 0) { possibleMoves.value.push([startX, startY-2]) } // 2 squares up
+				if (firstMove && pieceId(startX, startY-2) === 0) { possibleMoves.value.push([startX, startY-2]) } // 2 squares up
 			}
 			/* Black pieces (17-32) in range to be eaten */
-			if (startX === 0 && gameBoard.value[startX+1][startY-1].pieceId >= 17 && gameBoard.value[startX+1][startY-1].pieceId <= 32) {
-				possibleMoves.value.push([startX+1, startY-1])
-			}
-			if (startX === 7 && gameBoard.value[startX-1][startY-1].pieceId >= 17 && gameBoard.value[startX-1][startY-1].pieceId <= 32) {
-				possibleMoves.value.push([startX-1, startY-1])
-			}
-			if (startX > 0 && startX < 7 && gameBoard.value[startX-1][startY-1].pieceId >= 17 && gameBoard.value[startX-1][startY-1].pieceId <= 32) {
-				possibleMoves.value.push([startX-1, startY-1]) // available black piece up and left
-			}
-			if (startX > 0 && startX < 7 && gameBoard.value[startX+1][startY-1].pieceId >= 17 && gameBoard.value[startX+1][startY-1].pieceId <= 32) {
-				possibleMoves.value.push([startX+1, startY-1]) // available black piece up and right
-			}
+			if (startX === 0 && pieceId(startX+1, startY-1) >= 17 && pieceId(startX+1, startY-1) <= 32) { possibleMoves.value.push([startX+1, startY-1]) }
+			if (startX === 7 && pieceId(startX-1, startY-1) >= 17 && pieceId(startX-1, startY-1) <= 32) { possibleMoves.value.push([startX-1, startY-1]) }
+			/* Available black piece up and left */
+			if (startX > 0 && startX < 7 && pieceId(startX-1, startY-1) >= 17 && pieceId(startX-1, startY-1) <= 32) { possibleMoves.value.push([startX-1, startY-1]) }
+			/* Available black piece up and right */
+			if (startX > 0 && startX < 7 && pieceId(startX+1, startY-1) >= 17 && pieceId(startX+1, startY-1) <= 32) { possibleMoves.value.push([startX+1, startY-1]) }
 		}
 		if (color === 'black') { // todo: en passant
 			/* Regular move */
-			if(startY+1 <= 7 && gameBoard.value[startX][startY+1].pieceId === 0) {
+			if(startY+1 <= 7 && pieceId(startX, startY+1) === 0) {
 				possibleMoves.value.push([startX, startY+1]) // 1 square down
-				if (firstMove && gameBoard.value[startX][startY+2].pieceId === 0) { possibleMoves.value.push([startX, startY+2]) } // 2 squares down
+				if (firstMove && pieceId(startX, startY+2) === 0) { possibleMoves.value.push([startX, startY+2]) } // 2 squares down
 			}
 			/* White pieces (1-16) in range to be eaten */
-			if (startX === 0 && gameBoard.value[startX+1][startY+1].pieceId >= 1 && gameBoard.value[startX+1][startY+1].pieceId <= 16) {
-				possibleMoves.value.push([startX+1, startY+1])
-			}
-			if (startX === 7 && gameBoard.value[startX-1][startY+1].pieceId >= 1 && gameBoard.value[startX-1][startY+1].pieceId <= 16) {
-				possibleMoves.value.push([startX-1, startY+1])
-			}
-			if (startX > 0 && startX < 7 && gameBoard.value[startX-1][startY+1].pieceId >= 1 && gameBoard.value[startX-1][startY+1].pieceId <= 16) {
-				possibleMoves.value.push([startX-1, startY+1]) // available black piece down and left
-			}
-			if (startX > 0 && startX < 7 && gameBoard.value[startX+1][startY+1].pieceId >= 1 && gameBoard.value[startX+1][startY+1].pieceId <= 16) {
-				possibleMoves.value.push([startX+1, startY+1]) // available black piece down and right
-			}
+			if (startX === 0 && pieceId(startX+1, startY+1) >= 1 && pieceId(startX+1, startY+1) <= 16) { possibleMoves.value.push([startX+1, startY+1]) }
+			if (startX === 7 && pieceId(startX-1, startY+1) >= 1 && pieceId(startX-1, startY+1) <= 16) { possibleMoves.value.push([startX-1, startY+1]) }
+			/* Available black piece down and left */
+			if (startX > 0 && startX < 7 && pieceId(startX-1, startY+1) >= 1 && pieceId(startX-1, startY+1) <= 16) { possibleMoves.value.push([startX-1, startY+1]) }
+			/* Available black piece down and right*/ 
+			if (startX > 0 && startX < 7 && pieceId(startX+1, startY+1) >= 1 && pieceId(startX+1, startY+1) <= 16) { possibleMoves.value.push([startX+1, startY+1]) }
 		}
 	}
 	
@@ -248,7 +242,7 @@ const startDrag = (evt, startX, startY) => {
 	evt.dataTransfer.dropEffect = 'move'
 	evt.dataTransfer.effectAllowed = 'move'
 	/* Store id of the piece being dragged */
-	movingPieceId.value = gameBoard.value[startX][startY].pieceId
+	movingPieceId.value = pieceId(startX, startY)
 	/* Store starting position */
 	startingPosition.value = [startX, startY]
 	/* Check valid moves */
