@@ -221,38 +221,38 @@ const checkValidMoves = (startX, startY) => {
 
 	if (type === 'rook') {
 		/* Check left movements */
-		for (let i=startX-1; i >= 0; i--) {
-			if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+		for (let x=startX-1; x >= 0; x--) {
+			if (pieceId(x, startY) === 0) { possibleMoves.value.push([x, startY]) } // If square is empty, save position and continue
 			else {
-				if (color === 'white' && pieceId(i, startY) >= 17) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
-				if (color === 'black' && pieceId(i, startY) <= 16) { possibleMoves.value.push([i, startY]) } // If square has a white piece, save position
+				if (color === 'white' && pieceId(x, startY) >= 17) { possibleMoves.value.push([x, startY]) } // If square has a black piece, save position
+				if (color === 'black' && pieceId(x, startY) <= 16) { possibleMoves.value.push([x, startY]) } // If square has a white piece, save position
 				break // stop if a piece is found
 			}
 		}
 		/* Check right movements */
-		for (let i=startX+1; i <= 7; i++) {
-			if (pieceId(i, startY) === 0) { possibleMoves.value.push([i, startY]) } // If square is empty, save position and continue
+		for (let x=startX+1; x <= 7; x++) {
+			if (pieceId(x, startY) === 0) { possibleMoves.value.push([x, startY]) } // If square is empty, save position and continue
 			else {
-				if (color === 'white' && pieceId(i, startY) >= 17) { possibleMoves.value.push([i, startY]) } // If square has a black piece, save position
-				if (color === 'black' && pieceId(i, startY) <= 16) { possibleMoves.value.push([i, startY]) } // If square has a white piece, save position
+				if (color === 'white' && pieceId(x, startY) >= 17) { possibleMoves.value.push([x, startY]) } // If square has a black piece, save position
+				if (color === 'black' && pieceId(x, startY) <= 16) { possibleMoves.value.push([x, startY]) } // If square has a white piece, save position
 				break // stop if a piece is found
 			}
 		}
 		/* Check up movements */
-		for (let i=startY-1; i >= 0; i--) {
-			if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+		for (let y=startY-1; y >= 0; y--) {
+			if (pieceId(startX, y) === 0) { possibleMoves.value.push([startX, y]) } // If square is empty, save position and continue
 			else {
-				if (color === 'white' && pieceId(startX, i) >= 17) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
-				if (color === 'black' && pieceId(startX, i) <= 16) { possibleMoves.value.push([startX, i]) } // If square has a white piece, save position
+				if (color === 'white' && pieceId(startX, y) >= 17) { possibleMoves.value.push([startX, y]) } // If square has a black piece, save position
+				if (color === 'black' && pieceId(startX, y) <= 16) { possibleMoves.value.push([startX, y]) } // If square has a white piece, save position
 				break // stop if a piece is found
 			}
 		}
 		/* Check down movements */
-		for (let i=startY+1; i <= 7; i++) {
-			if (pieceId(startX, i) === 0) { possibleMoves.value.push([startX, i]) } // If square is empty, save position and continue
+		for (let y=startY+1; y <= 7; y++) {
+			if (pieceId(startX, y) === 0) { possibleMoves.value.push([startX, y]) } // If square is empty, save position and continue
 			else {
-				if (color === 'white' && pieceId(startX, i) >= 17) { possibleMoves.value.push([startX, i]) } // If square has a black piece, save position
-				if (color === 'black' && pieceId(startX, i) <= 16) { possibleMoves.value.push([startX, i]) } // If square has a white piece, save position
+				if (color === 'white' && pieceId(startX, y) >= 17) { possibleMoves.value.push([startX, y]) } // If square has a black piece, save position
+				if (color === 'black' && pieceId(startX, y) <= 16) { possibleMoves.value.push([startX, y]) } // If square has a white piece, save position
 				break // stop if a piece is found
 			}
 		}
