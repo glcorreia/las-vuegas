@@ -98,24 +98,6 @@ const initializeGameBoard = () => {
 	console.log('Las Vuegas Chess', version.value)
 	if (moveHelper.value) console.log ('> Helper ON')
 
-	/* Black pieces */
-	gameBoard.value[0][1].pieceId = 17 // Pawn
-	gameBoard.value[1][1].pieceId = 18 // Pawn
-	gameBoard.value[2][1].pieceId = 19 // Pawn
-	gameBoard.value[3][1].pieceId = 20 // Pawn
-	gameBoard.value[4][1].pieceId = 21 // Pawn
-	gameBoard.value[5][1].pieceId = 22 // Pawn
-	gameBoard.value[6][1].pieceId = 23 // Pawn
-	gameBoard.value[7][1].pieceId = 24 // Pawn
-	gameBoard.value[0][0].pieceId = 25 // Rook
-	gameBoard.value[1][0].pieceId = 26 // Knight
-	gameBoard.value[2][0].pieceId = 27 // Bishop
-	gameBoard.value[3][0].pieceId = 28 // Queen
-	gameBoard.value[4][0].pieceId = 29 // King
-	gameBoard.value[5][0].pieceId = 30 // Bishop
-	gameBoard.value[6][0].pieceId = 31 // Knight
-	gameBoard.value[7][0].pieceId = 32 // Rook
-
 	/* White pieces */
 	gameBoard.value[0][6].pieceId = 1 // Pawn
 	gameBoard.value[1][6].pieceId = 1 // Pawn
@@ -134,6 +116,23 @@ const initializeGameBoard = () => {
 	gameBoard.value[5][7].pieceId = 14 // Bishop
 	gameBoard.value[6][7].pieceId = 15 // Knight
 	gameBoard.value[7][7].pieceId = 16 // Rook
+	/* Black pieces */
+	gameBoard.value[0][1].pieceId = 17 // Pawn
+	gameBoard.value[1][1].pieceId = 18 // Pawn
+	gameBoard.value[2][1].pieceId = 19 // Pawn
+	gameBoard.value[3][1].pieceId = 20 // Pawn
+	gameBoard.value[4][1].pieceId = 21 // Pawn
+	gameBoard.value[5][1].pieceId = 22 // Pawn
+	gameBoard.value[6][1].pieceId = 23 // Pawn
+	gameBoard.value[7][1].pieceId = 24 // Pawn
+	gameBoard.value[0][0].pieceId = 25 // Rook
+	gameBoard.value[1][0].pieceId = 26 // Knight
+	gameBoard.value[2][0].pieceId = 27 // Bishop
+	gameBoard.value[3][0].pieceId = 28 // Queen
+	gameBoard.value[4][0].pieceId = 29 // King
+	gameBoard.value[5][0].pieceId = 30 // Bishop
+	gameBoard.value[6][0].pieceId = 31 // Knight
+	gameBoard.value[7][0].pieceId = 32 // Rook
 }
 
 const getPieceType = (row, col) => {
@@ -195,6 +194,29 @@ const checkValidMoves = (startX, startY) => {
 			if (startX > 0 && startX < 7 && pieceId(startX-1, startY+1) >= 1 && pieceId(startX-1, startY+1) <= 16) { possibleMoves.value.push([startX-1, startY+1]) }
 			/* Available black piece down and right*/ 
 			if (startX > 0 && startX < 7 && pieceId(startX+1, startY+1) >= 1 && pieceId(startX+1, startY+1) <= 16) { possibleMoves.value.push([startX+1, startY+1]) }
+		}
+	}
+
+	if (type === 'knight') {
+		if (color === 'white') {
+			if (startX-1 >= 0 && startY-2 >= 0 && (pieceId(startX-1, startY-2) === 0 || pieceId(startX-1, startY-2) >= 17)) { possibleMoves.value.push([startX-1, startY-2]) } // ↰
+			if (startX+1 <= 7 && startY-2 >= 0 && (pieceId(startX+1, startY-2) === 0 || pieceId(startX+1, startY-2) >= 17)) { possibleMoves.value.push([startX+1, startY-2]) } // ↱
+			if (startX-1 >= 0 && startY+2 <= 7 && (pieceId(startX-1, startY+2) === 0 || pieceId(startX-1, startY+2) >= 17)) { possibleMoves.value.push([startX-1, startY+2]) } // ↲
+			if (startX+1 <= 7 && startY+2 <= 7 && (pieceId(startX+1, startY+2) === 0 || pieceId(startX+1, startY+2) >= 17)) { possibleMoves.value.push([startX+1, startY+2]) } // ↳
+			if (startX-2 >= 0 && startY-1 >= 0 && (pieceId(startX-2, startY-1) === 0 || pieceId(startX-2, startY-1) >= 17)) { possibleMoves.value.push([startX-2, startY-1]) } // ↖
+			if (startX-2 >= 0 && startY+1 <= 7 && (pieceId(startX-2, startY+1) === 0 || pieceId(startX-2, startY+1) >= 17)) { possibleMoves.value.push([startX-2, startY+1]) } // ↙
+			if (startX+2 <= 7 && startY-1 >= 0 && (pieceId(startX+2, startY-1) === 0 || pieceId(startX+2, startY-1) >= 17)) { possibleMoves.value.push([startX+2, startY-1]) } // ↗
+			if (startX+2 <= 7 && startY+1 <= 7 && (pieceId(startX+2, startY+1) === 0 || pieceId(startX+2, startY+1) >= 17)) { possibleMoves.value.push([startX+2, startY+1]) } // ↘
+		}
+		if (color === 'black') {
+			if (startX-1 >= 0 && startY-2 >= 0 && pieceId(startX-1, startY-2) <= 16) { possibleMoves.value.push([startX-1, startY-2]) } // ↰
+			if (startX+1 <= 7 && startY-2 >= 0 && pieceId(startX+1, startY-2) <= 16) { possibleMoves.value.push([startX+1, startY-2]) } // ↱
+			if (startX-1 >= 0 && startY+2 <= 7 && pieceId(startX-1, startY+2) <= 16) { possibleMoves.value.push([startX-1, startY+2]) } // ↲
+			if (startX+1 <= 7 && startY+2 <= 7 && pieceId(startX+1, startY+2) <= 16) { possibleMoves.value.push([startX+1, startY+2]) } // ↳
+			if (startX-2 >= 0 && startY-1 >= 0 && pieceId(startX-2, startY-1) <= 16) { possibleMoves.value.push([startX-2, startY-1]) } // ↖
+			if (startX-2 >= 0 && startY+1 <= 7 && pieceId(startX-2, startY+1) <= 16) { possibleMoves.value.push([startX-2, startY+1]) } // ↙
+			if (startX+2 <= 7 && startY-1 >= 0 && pieceId(startX+2, startY-1) <= 16) { possibleMoves.value.push([startX+2, startY-1]) } // ↗
+			if (startX+2 <= 7 && startY+1 <= 7 && pieceId(startX+2, startY+1) <= 16) { possibleMoves.value.push([startX+2, startY+1]) } // ↘
 		}
 	}
 	
@@ -345,7 +367,7 @@ a, a:hover {
 			box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			-webkit-box-sizing: border-box;
-			box-shadow: inset 0 0 15px #ffc457;
+			box-shadow: inset 0 0 15px #eea404;
 		}
 	}
 
