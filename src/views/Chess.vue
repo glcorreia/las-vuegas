@@ -8,27 +8,12 @@
 					<!-- <div>eaten piece ICON goes here</div> -->
 				</div>
 				<div class="grid-container">
-					<!-- <div
-						v-for="position in 64"
-						:key="position"
-						class="grid-square"
-						@click="positionClickHandler(position)"
-						@drop="onDrop(position)"
-						@dragover.prevent
-						@dragenter.prevent>
-						<Pieces
-							v-if="gameBoard[position].pieceId"
-							:type="getPieceType(position)"
-							:color="getPieceColor(position)"
-							draggable
-							@dragstart="startDrag($event, position)"
-						/>
-					</div> -->
 					<div v-for="(row, rowIndex) in 8" :key="rowIndex">
 						<div
 						v-for="(col, colIndex) in 8"
 						:key="colIndex"
-						class="grid-square"
+						class="square"
+						:class="{'square-focus' : gameBoard[rowIndex][colIndex].focus}"
 						@click="positionClickHandler(rowIndex, colIndex)"
 						@drop="onDrop(rowIndex, colIndex)"
 						@dragover.prevent
@@ -63,10 +48,12 @@ import { ref, computed, defineAsyncComponent } from 'vue'
 import Pieces from '../components/chess/Pieces.vue'
 
 /* Data */
+const version = ref('v0.01')
 const gameBoard = ref(Array(8).fill(null).map(() =>
 	Array(8).fill(null).map(() =>
-		({ object: null }))
+		({ pieceId: 0, focus: false }))
 ))
+const moveHelper = ref(true)
 
 const pieces = ref([
 	/* White pieces */
@@ -107,6 +94,10 @@ const pieces = ref([
 
 /* Functions */
 const initializeGameBoard = () => {
+	/* Info */
+	console.log('Las Vuegas Chess', version.value)
+	if (moveHelper.value) console.log ('> Helper ON')
+
 	/* Black pieces */
 	gameBoard.value[0][0].pieceId = 25 // Rook
 	gameBoard.value[1][0].pieceId = 26 // Knight
@@ -158,7 +149,57 @@ const positionClickHandler = (row, col) => {
 	if (!!gameBoard.value[row][col].pieceId) {
 		/* Convert row to Letter, inverts cols and shows piece name */
 		console.log(String.fromCharCode(row + 65), Math.abs(col - 8) , pieces.value.find(piece => piece.id === gameBoard.value[row][col].pieceId).type)
+
+		checkValidMoves(row, col, movingPieceId.value)
 	}
+}
+
+const possibleMoves = ref([])
+const checkValidMoves = (startX, startY, pieceId) => {
+	const type = getPieceType(startX, startY)
+	const color = getPieceColor(startX, startY)
+	const firstMove = !pieces.value.find(piece => piece.id === gameBoard.value[startX][startY].pieceId).hasMoved
+	possibleMoves.value = []
+
+	if (type === 'pawn') {
+		if (color === 'white' && startY-1 >= 0 && gameBoard.value[startX][startY-1].pieceId === 0) {
+			possibleMoves.value.push([startX, startY-1]) // 1 square up
+			if (firstMove) { possibleMoves.value.push([startX, startY-2]) } // 2 squares up
+		}
+		if (color === 'black' && startY+1 <= 7 && gameBoard.value[startX][startY+1].pieceId === 0) {
+			possibleMoves.value.push([startX, startY+1]) // 1 square down
+			if (firstMove) { possibleMoves.value.push([startX, startY+2]) } // 2 squares down
+		}
+	}
+	
+	/* Highlight available moves */
+	if (moveHelper.value) highlightSquares()
+}
+
+const highlightedMoves = ref([])
+const highlightSquares = () => {
+	/* Reset any previous highlighted squares */
+	if (highlightedMoves.value.length) {
+		for (let i=0; i < highlightedMoves.value.length; i++) {
+			const row = highlightedMoves.value[i][0]
+			const col = highlightedMoves.value[i][1]
+
+			gameBoard.value[row][col].focus = false
+		}
+		highlightedMoves.value = []
+	}
+
+	/* Sets focus on possible moves */
+	for (let i=0; i < possibleMoves.value.length; i++) {
+		const row = possibleMoves.value[i][0]
+		const col = possibleMoves.value[i][1]
+
+		gameBoard.value[row][col].focus = true
+	}
+	highlightedMoves.value = possibleMoves.value
+
+	/* Reset possible moves */
+	possibleMoves.value = []
 }
 
 /******************************
@@ -174,6 +215,8 @@ const startDrag = (evt, startX, startY) => {
 	movingPieceId.value = gameBoard.value[startX][startY].pieceId
 	/* Store starting position */
 	startingPosition.value = [startX, startY]
+	/* Check valid moves */
+	// checkValidMoves(startX, startY, movingPieceId.value)
 }
 
 const onDrop = (endX, endY) => {
@@ -182,6 +225,10 @@ const onDrop = (endX, endY) => {
 
 	/* If the piece ends up on the same position, don't do anything */
 	if (endX === startX && endY === startY) return
+	/* Check possible moves */
+	// COMPARE endX+endY to all positions in availableMoves[]
+	// if theres a match continue, if not returns
+
 	/* Save new position for dragged piece */
 	gameBoard.value[endX][endY].pieceId = movingPieceId.value
 	/* Clear previous position */
@@ -247,7 +294,7 @@ a, a:hover {
 		grid-template-columns: repeat(8, var(--square-size));
 		grid-template-rows: repeat(8, var(--square-size));
 
-		.grid-square {
+		.square {
 			width: var(--square-size);
 			height: var(--square-size);
 
@@ -256,18 +303,25 @@ a, a:hover {
 			justify-content: center;
 		}
 
-		.grid-square:hover {
+		.square:hover {
 			background-color: var(--square-focus) !important;
+		}
+
+		.square-focus {
+			box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			-webkit-box-sizing: border-box;
+			box-shadow: inset 0 0 15px #ffc457;
 		}
 	}
 
-	.grid-container > div:nth-child(odd) .grid-square:nth-child(odd),
-	.grid-container > div:nth-child(even), .grid-square:nth-child(even) {
+	.grid-container > div:nth-child(odd) .square:nth-child(odd),
+	.grid-container > div:nth-child(even), .square:nth-child(even) {
 		background-color:  var(--square-black);
 	}
 
-	.grid-container > div:nth-child(odd) .grid-square:nth-child(even),
-	.grid-container > div:nth-child(even), .grid-square:nth-child(odd) {
+	.grid-container > div:nth-child(odd) .square:nth-child(even),
+	.grid-container > div:nth-child(even), .square:nth-child(odd) {
 		background-color:  var(--square-white);
 	}
 
